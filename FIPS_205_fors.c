@@ -823,14 +823,6 @@ FILE* f = 0;
 
 void FIPS205_AVX_fors_z0(uint8_t node[FIPS205_N], const void* PK_seed, __m256i in64[2]/*const uint8_t* adr*/, uint32_t i)
 {
-	/*__m256i TreeIndexMaskaLow = _mm256_setr_epi8(
-		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0xFF, 0xFF,
-		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF);
-	__m256i TreeIndexMaskaHigh = _mm256_setr_epi8(
-		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-		0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF);*/
 
 	//__m256i blocks[64];
 	__m256i keysBlock;
@@ -843,29 +835,6 @@ void FIPS205_AVX_fors_z0(uint8_t node[FIPS205_N], const void* PK_seed, __m256i i
 	setTreeIndex(w8, i);
 	w[0] = _mm256_shuffle_epi8(w[0], maska_for_shuffle_32);
 	w[1] = _mm256_shuffle_epi8(w[1], maska_for_shuffle_32);
-//	//uint8_t * w8 = (uint8_t*)w;
-//	//setTreeIndex(w8, i);
-//	//setType
-//	//w[0] = _mm256_shuffle_epi8(w[0], maska_for_shuffle_32);
-//	//w[1] = _mm256_shuffle_epi8(w[1], maska_for_shuffle_32);
-//	//memcpy(w, in64, 2 * sizeof(__m256i));
-//	//AVXSetTreeIndex(in64[0], i);
-//	//in64[0] = _mm256_and_si256(TreeIndexMaska, in64[0]);
-//	//w[0] = ChangeTreeIndex(w[0], i);
-//#if 1
-//	uint8_t* i8 = (uint8_t*)&i;
-//	uint16_t t16_low = ((uint16_t)i8[0] << 8) | i8[1];
-//	uint16_t t16_high = ((uint16_t)i8[2] << 8) | i8[3];
-//
-//	t1 = _mm256_and_si256(_mm256_and_si256(TreeIndexMaskaLow, TreeIndexMaskaHigh), w[0]);
-//	t2 = _mm256_andnot_si256(TreeIndexMaskaLow, _mm256_set1_epi16(t16_low));
-//	t3 = _mm256_andnot_si256(TreeIndexMaskaHigh, _mm256_set1_epi16(t16_high));
-//	t2 = _mm256_or_si256(t2, t3);
-//	w[0] = _mm256_or_si256(t2, t1);
-//#else
-//	//w[0] = ChangeTreeIndex(w[0], i);
-//#endif
-		
 	memcpy(&keysBlock, (__m256i*)PK_seed, sizeof(__m256i));
 
 	AVX_sha256_compress((uint32_t*)&keysBlock, w);
@@ -1685,20 +1654,6 @@ void FIPS205_AVX_read_auth(__m256i auth[FIPS205_A][((FIPS205_K + 7) / 8 * 8)], c
 		}
 	}
 #endif
-//#if FIPS205_N != 16
-//	//__m256i temp[8];
-//	for (i = 0; i < FIPS205_A; ++i)
-//	{
-//		__m256i* pauth = auth[i];
-//		for (j = 0; j < (FIPS205_K + 7) / 8; ++j)
-//		{
-//			memcpy(temp[i], pauth, 8 * sizeof(__m256i));
-//			convert_32_64(pauth, temp[i]);
-//			pauth += 8;
-//		}
-//	}
-//
-//#endif
 
 }
 
@@ -1795,44 +1750,10 @@ void FIPS205_AVX_calc_node1(
 			 temp_node2[i * 8 + 4 + k] = _mm256_blendv_epi64(auth[i * 8 + 4 + k], node0[i * 8 + 4 + k], odd1);
 		}
 #endif
-		/*memcpy(temp, &temp_node1[i * 8], 8 * sizeof(__m256i));
-		convert_32_64(&temp_node1 [i * 8], temp);
-
-		memcpy(temp, &temp_node2[i * 8], 8 * sizeof(__m256i));
-		convert_32_64(&temp_node2[i * 8], temp);*/
-
-
-
 	}
 
 
 	FIPS205_AVX_fors_H_(node1_blocks, blocks, predcalc_pk, temp_node1, temp_node2, cur_ind, j + 1);
-//#else
-//	__m256i ind_2j[2 * ((FIPS205_K + 7) / 8) /** 8*/], odd,
-//		temp_node1[(FIPS205_K + 3) / 4 * 4], temp_node2[(FIPS205_K + 3) / 4 * 4];
-//	uint32_t i, k;
-//	for (i = 0; i < (FIPS205_K + 7) / 8; ++i)
-//	{
-//		ind_2j [2 * i] = _mm256_srli_epi64 (_mm256_cvtepu32_epi64(_mm256_extracti128_si256(ind[i], 0)), j);
-//		ind_2j[2 * i + 1] = _mm256_srli_epi64 (_mm256_cvtepu32_epi64(_mm256_extracti128_si256(ind[i], 0)), j);
-//		//ind_2j[i] = _mm256_srli_epi32(ind[i], j);
-//		odd = _mm256_sub_epi32(_mm256_setzero_si256(), _mm256_and_si256(ind_2j[i], _mm256_set1_epi32(1)));
-//		cur_ind[i] = _mm256_srli_epi32(_mm256_add_epi32(cur_ind[i], odd), 1);
-//		// set Tree Index (cur_ind);
-//		for (k = 0; k < 8; ++k)
-//		{
-//			temp_node1[i * 8 + k] = _mm256_blendv_epi32(node0[i * 8 + k], auth[i * 8 + k], odd);
-//			temp_node2[i * 8 + k] = _mm256_blendv_epi32(auth[i * 8 + k], node0[i * 8 + k], odd);
-//		}
-//
-//		/*FIPS205_AVX_fors_H_(node1_blocks , blocks, predcalc_pk, temp_node1, temp_node2, &cur_ind [i], j + 1);
-//		node1_blocks += 8;*/
-//
-//
-//	}
-//
-//	FIPS205_AVX_fors_H_(node1_blocks, blocks, predcalc_pk, temp_node1, temp_node2, cur_ind, j + 1);
-//#endif
 }
 
 
@@ -1957,194 +1878,6 @@ void FIPS205_AVX_fors_pkFromSig(
 
 }
 
-//uint8_t* FIPS205_AVX_fors_sign_and_pk(
-//	uint8_t* SIG_fors,
-//	uint8_t* PK_fors,
-//	const uint8_t* md,
-//	const uint8_t* SK_seed,
-//	const void* PK_single256_512, 
-//	const void* PKBlock256,
-//	const void* PKBlock256_512,
-//
-//
-//	const uint8_t* adr)
-//{
-//	__declspec (align (32))
-//		uint32_t ind[(FIPS205_K + 7) / 8 * 8] = { 0 };
-//	__m256i* ind256 = (__m256i*)ind;
-//	fors_base(ind, md, FIPS205_K);
-//
-//	__m256i in_block[2];
-//	__m256i in_block_pk [80];
-//#if FIPS205_N == 16
-//	__m256i in_block_for_H[2];
-//#else
-//	__m256i in_block_for_H[4];
-//#endif
-//	FIPS205_AVX_fors_init(in_block, SK_seed, adr);
-//	FIPS205_AVX_fors_init_in_block0(in_block_for_H, adr);
-//	uint8_t* pSigFors = SIG_fors;
-//	uint8_t* p_path = SIG_fors + FIPS205_K * FIPS205_N;
-//	uint8_t sk[FIPS205_K][FIPS205_N];
-//	uint32_t i, j;
-//	__m256i start_value =
-//		_mm256_setr_epi32(
-//			0 * ((1 << (FIPS205_A))),
-//			1 * ((1 << (FIPS205_A))),
-//			2 * ((1 << (FIPS205_A))),
-//			3 * ((1 << (FIPS205_A))),
-//			4 * ((1 << (FIPS205_A))),
-//			5 * ((1 << (FIPS205_A))),
-//			6 * ((1 << (FIPS205_A))),
-//			7 * ((1 << (FIPS205_A)))
-//		);
-//
-//	__m256i h_value = _mm256_set1_epi32(8 * (1 << (FIPS205_A)));
-//
-//	__m256i cur_value = start_value;
-//
-//	__m256i cur_ind_pk[(FIPS205_K + 7) / 8], cur_ind[(FIPS205_K + 7) / 8];
-//
-//	for (i = 0; i < (FIPS205_K + 7) / 8; ++i)
-//	{
-//		cur_ind_pk[i] = _mm256_or_si256(cur_value, ind256[i]);
-//		//cur_ind[i] = cur_ind_pk[i] = _mm256_or_si256(cur_value, ind256[i]);
-//		cur_value = _mm256_add_epi32(cur_value, h_value);
-//	}
-//
-//	__m256i sk_256[(FIPS205_K + 7) / 8 * 8];
-//	__m256i node0[(FIPS205_K + 7) / 8 * 8];
-//	//fors_get_node_sk(sk, in_block, PK_seed, cur_ind);
-//	fors_get_node_sk_(sk_256, in_block, PKBlock256, cur_ind_pk);
-//	convert_to_keys(sk, sk_256);
-//	
-//	for (i = 0; i < FIPS205_K; ++i)
-//	{
-//		memcpy(pSigFors, sk[i], FIPS205_N);
-//		pSigFors += FIPS205_N + FIPS205_A * FIPS205_N;
-//	}
-//
-//	in_block_pk[0] = _mm256_setzero_si256();
-//	in_block_pk[1] = _mm256_setzero_si256();
-//	uint8_t* p = (uint8_t*)in_block_pk;
-//	memcpy(p, adr, ADR_SIZE);
-//	p[ADR_SIZE + FIPS205_N] = 0x80;
-//	int bytes = (64 + ADR_SIZE + FIPS205_N);
-//	p[62] = (uint8_t)(bytes >> 5);
-//	p[63] = (uint8_t)(bytes << 3);
-//
-//	in_block_pk[0] = _mm256_shuffle_epi8(in_block_pk[0], maska_for_shuffle_32);
-//	in_block_pk[1] = _mm256_shuffle_epi8(in_block_pk[1], maska_for_shuffle_32);
-//	
-//	__m256i blocks[64];
-//	memcpy(in_block_pk + 2, in_block_pk, 2 * sizeof(__m256));
-//	memcpy(in_block_pk + 4, in_block_pk, 4 * sizeof(__m256));
-//	memcpy(in_block_pk + 8, in_block_pk, 8 * sizeof(__m256));
-//
-//	uint32_t* temp32 = (uint32_t*)in_block_pk;
-//
-//	for (int i = 0; i < 16; ++i)
-//	{
-//		blocks[i] = _mm256_i32gather_epi32((const int*)temp32, idx16, 4);
-//		++temp32;
-//	}
-//
-//
-//	blocks[3] = _mm256_and_si256(_mm256_set1_epi32(0xFFFF0000), blocks[3]); // tree_height
-//
-//	
-//	FIPS205_AVX_calc_node0(node0, PKBlock256, blocks, cur_ind_pk, sk_256);
-//		
-//	
-//	uint8_t* pAuth = SIG_fors + FIPS205_N;
-//
-//	ind256 = (__m256i*)ind;
-//
-//	__m256i node[(FIPS205_K + 7) / 8 * 16];
-//
-//	for (j = 0; j < FIPS205_A; ++j)
-//	{
-//		
-//
-//		uint8_t* curpAuth = pAuth;
-//		ind256 = (__m256i*)ind;
-//		__m256i start_value =
-//			_mm256_setr_epi32(
-//				0 * ((1 << (FIPS205_A - j))),
-//				1 * ((1 << (FIPS205_A - j))),
-//				2 * ((1 << (FIPS205_A - j))),
-//				3 * ((1 << (FIPS205_A - j))),
-//				4 * ((1 << (FIPS205_A - j))),
-//				5 * ((1 << (FIPS205_A - j))),
-//				6 * ((1 << (FIPS205_A - j))),
-//				7 * ((1 << (FIPS205_A - j)))
-//			);
-//		cur_value = start_value;
-//		__m256i step_value = _mm256_set1_epi32(8 * ((1 << (FIPS205_A - j))));
-//
-//		__m256i s256[(FIPS205_K + 7) / 8];
-//
-//		for (i = 0; i < (FIPS205_K + 7) / 8; ++i)
-//		{
-//			s256[i] = _mm256_xor_si256(_mm256_srli_epi32(ind256[i], j), _mm256_set1_epi32(1));
-//			cur_ind[i] = _mm256_or_si256(cur_value, s256[i]);
-//			cur_value = _mm256_add_epi32(cur_value, step_value);
-//		}
-//
-//
-//		uint32_t t = j;
-//		//uint32_t iter = 1;
-//		uint32_t cvt_type32;
-//		if (t == 0)
-//		{
-//			cvt_type32 = 1;
-//			fors_get_node_z0__(node, in_block, PKBlock256, cur_ind);
-//
-//		}
-//		else
-//		{
-//			cvt_type32 = 0;
-//			FIPS205_AVX_fors_node_(
-//				node, in_block, in_block_for_H, PKBlock256, PKBlock256_512, cur_ind, /*iter, */t);
-//		}
-//		if (cvt_type32)
-//			convert_to_keys(sk, node);
-//		else
-//		{
-//#if FIPS205_N == 16
-//			convert_to_keys(sk, node);
-//#else
-//
-//			convert_to_keys_64_(sk, node);
-//#endif	
-//		}
-//
-//		for (i = 0; i < FIPS205_K; ++i)
-//		{
-//			memcpy(curpAuth, sk[i], FIPS205_N);
-//
-//			curpAuth += FIPS205_N + FIPS205_A * FIPS205_N;
-//		}
-//
-//		FIPS205_AVX_calc_node1(node0, PKBlock256_512, in_block_for_H, j, ind256, cur_ind_pk, node0, node);
-//		pAuth += FIPS205_N;
-//	}
-//	uint8_t forspkADRS[ADR_SIZE];
-//	memcpy(forspkADRS, adr, ADR_SIZE);
-//	setType1(forspkADRS, FORS_ROOTS);
-//
-//#if FIPS205_N == 16
-//	convert_to_keys_64_256(node, node0);
-//#else
-//	convert_to_keys_128_256(node, node0);
-//#endif
-//	AVX_Tl(PK_fors, PK_single256_512, forspkADRS, node, FIPS205_K);
-//
-//	return SIG_fors + FIPS205_K * FIPS205_N * (1 + FIPS205_A);
-//
-//}
-
-
 //in_block_for_H;
 uint8_t * FIPS205_AVX_fors_sign_new(uint8_t *sign, uint8_t *md, /*auth[FIPS205_K][FIPS205_A][FIPS205_N], */const uint8_t * SK_seed, const void* PK_256, const void* PK_256_512, /*__m256i in64[2], */uint8_t * adr)
 {
@@ -2224,132 +1957,6 @@ uint8_t * FIPS205_AVX_fors_sign_new(uint8_t *sign, uint8_t *md, /*auth[FIPS205_K
 			
 			
 			uint8_t *pblocks = (uint8_t*)in_block_for_H;
-//			#ifndef  FAST
-//				__m256i temp[(1 << FIPS205_A) / 32];
-//				__m256i nodes[32];
-//				uint32_t t = 0;
-//				uint32_t r1 = 1;
-//		
-//				// j - porcii number
-//				// k - current pozition in porcii
-//				// l  - level
-//				// m - currnet number of portii
-//				uint32_t j, k, r, t, l = 0, m; 
-//				#if FIPS205_N == 16
-//					__m256i blocks_[2];
-//				#else
-//					__m256i blocks_[4];
-//				#endif
-//					// for levels < 32;
-//					// 
-//				const uint32_t por_size = (1 << FIPS205_A) / 32;
-//					uint32_t r = por_size;
-//					uint32_t por_number = ind[i] / por_size;
-//					__m256i cur_node[32];
-//		
-//					for (j = 0; j < 32; ++j) // porcii
-//					{
-//						// for current porcii levels 0.. FIPS205_K - 1; 
-//			
-//						// level 0 
-//						for (k = 0; k < (1 << FIPS205_A) / 32; ++k)
-//						{
-//							fors_get_node_z0_(&temp[k], in_block, PK_256_512, cur_ind + k);
-//							cur_ind += (1 << FIPS205_A) / 32;
-//						}
-//			
-//						if (j == por_number)
-//							memcpy(&auth[i][l++], &temp[(ind[i] ^ 1) - j * por_size], sizeof (__m256i));
-//			
-//						//levels 1, 2, ...						
-//						while (r != 1)
-//						{
-//							ind[i] /= 2;
-//				
-//							//int m = 0;
-//				
-//							for (k = 0; k < r / 2; ++k)
-//							{
-//								//setTreeHeight(pblocks, r1);
-//								//setTreeIndex(pblocks, j);
-//								memcpy(pblocks + ADR_SIZE, &temp[2 * k], FIPS205_N);
-//								memcpy(pblocks + ADR_SIZE + FIPS205_N, &temp[2 * k + 1], FIPS205_N);
-//
-//			#if FIPS205_N == 16
-//								blocks_[0] = _mm256_shuffle_epi8(blocks[0], maska_for_shuffle_32);
-//								blocks_[1] = _mm256_shuffle_epi8(blocks[1], maska_for_shuffle_32);
-//								memcpy(&state, (uint8_t*)PK_256_512, sizeof(state));
-//								AVX_sha256_compress((uint32_t*)&state, blocks_);
-//								state = _mm256_shuffle_epi8(state, maska_for_shuffle_32);
-//								memcpy(temp[k], &state, FIPS205_N);
-//			#else
-//								blocks_[0] = _mm256_shuffle_epi8(blocks[0], maska_for_shuffle_64);
-//								blocks_[1] = _mm256_shuffle_epi8(blocks[1], maska_for_shuffle_64);
-//								blocks_[2] = _mm256_shuffle_epi8(blocks[2], maska_for_shuffle_64);
-//								blocks_[3] = _mm256_shuffle_epi8(blocks[3], maska_for_shuffle_64);
-//								memcpy(state, (uint8_t*)PK_256_512, sizeof(state));
-//								AVX_sha512_compress((uint32_t*)state, blocks_);
-//								state[0] = _mm256_shuffle_epi8(state[0], maska_for_shuffle_64);
-//								memcpy(&temp[k], &state[0], FIPS205_N);
-//			#endif
-//
-//					
-//							}
-//							r /= 2;
-//							por_number = ind[i] / r;
-//							if (j == por_number)
-//								memcpy(&auth[i][l++], &temp[(ind[i] ^ 1) - j * por_size], sizeof(__m256i));
-//							//++r1;
-//				
-//						}
-//			
-//						memcpy(&cur_node[j], &temp[0], sizeof(__m256i));
-//
-//					}
-//		
-//					r = 32;
-//					while (r != 1)
-//					{
-//						//int j = 0;
-//						ind[i] /= 2;
-//
-//						for (k = 0; k < r / 2; ++k)
-//						{
-//							//setTreeHeight(pblocks, r1);
-//							//setTreeIndex(pblocks, j);
-//							memcpy(pblocks + ADR_SIZE, &cur_node[2 * k], FIPS205_N);
-//							memcpy(pblocks + ADR_SIZE + FIPS205_N, &cur_node[2 * k + 1], FIPS205_N);
-//
-//			#if FIPS205_N == 16
-//							blocks_[0] = _mm256_shuffle_epi8(blocks[0], maska_for_shuffle_32);
-//							blocks_[1] = _mm256_shuffle_epi8(blocks[1], maska_for_shuffle_32);
-//							memcpy(&state, (uint8_t*)PK_256_512, sizeof(state));
-//							AVX_sha256_compress((uint32_t*)&state, blocks_);
-//							state = _mm256_shuffle_epi8(state, maska_for_shuffle_32);
-//							memcpy(cur_node[k], &state, FIPS205_N);
-//			#else
-//				
-//							blocks_[0] = _mm256_shuffle_epi8(blocks[0], maska_for_shuffle_64);
-//							blocks_[1] = _mm256_shuffle_epi8(blocks[1], maska_for_shuffle_64);
-//							blocks_[2] = _mm256_shuffle_epi8(blocks[2], maska_for_shuffle_64);
-//							blocks_[3] = _mm256_shuffle_epi8(blocks[3], maska_for_shuffle_64);
-//							memcpy(state, (uint8_t*)PK_256_512, sizeof(state));
-//							AVX_sha512_compress((uint32_t*)state, blocks_);
-//							state[0] = _mm256_shuffle_epi8(state[0], maska_for_shuffle_64);
-//							memcpy(&cur_node[k], &state[0], FIPS205_N);
-//			#endif
-//
-//							//++j;
-//						}
-//
-//						memcpy(&auth[i][l++], &cur_node[(ind[i] ^ 1)], sizeof(__m256i));
-//						++r1;
-//						r /= 2;
-//						ind[i] /= 2;
-//					}
-//					//memcpy(&node[j], &temp[0], sizeof(__m256i));
-//
-//#else
 #if 0
 			__m256i temp1[1 << FIPS205_A];
 			__m256i temp2[1 << FIPS205_A];
@@ -2534,13 +2141,7 @@ uint8_t *part_sign_ (
 	
 	//__m256i temp[8];
 	uint32_t j, k = 0, l = 0;
-	//uint32_t ind_i = indi;
-	
-	//uint32_t need_j = ind_i / por_size; // parts number 
-	//uint32_t need_k = ind_i % por_size;	// in part number
-	//uint32_t need_k1 = need_k / 8; //in block = 8
-	//uint32_t need_k2 = need_k % 8; //in block = 8
-	//uint32_t need_k_ = need_k2 ^ 1;
+
 	uint32_t* block_keys_32;
 	uint32_t start_j = por_number * por_size;
 	uint32_t end_j  = start_j + por_size;
@@ -2570,19 +2171,6 @@ uint8_t *part_sign_ (
 
 		*start_value = _mm256_add_epi32(*start_value, eight_256);
 	}
-	// node [0]
-	//if (need_j == por_number)										// if part with i
-	//{
-	//	block_keys_32 = (uint32_t*)(temp1 + 8 * need_k1 );
-	//	for (k = 0; k < need_k2; ++k)
-	//	{
-	//		t = _mm256_i32gather_epi32((const int*)block_keys_32++, idx8, 4);
-	//	}
-	//	t = _mm256_i32gather_epi32((const int*)block_keys_32++, idx8, 4);
-	//	t = _mm256_shuffle_epi8(t, maska_for_shuffle_32);
-	//	memcpy(psign, &t, FIPS205_N);
-	//	psign += FIPS205_N;
-	//}
 
 	// nodes for level 0
 	block_keys_32 = (uint32_t*)(temp2);
@@ -2601,12 +2189,6 @@ uint8_t *part_sign_ (
 		}
 
 	}
-
-	//if (need_j == por_number)					//auth for level [0]
-	//{
-	//	memcpy(psign, temp1 + 8 * need_k1 + need_k_, FIPS205_N);
-	//	psign += FIPS205_N;
-	//}
 	
 	// for levels 1 .. FIPS205_A - STEP
 #if FIPS205_N == 16
@@ -2663,13 +2245,7 @@ uint8_t *part_sign_ (
 
 			#endif
 		}
-		/*need_j = (ind_i ^ 1)/ por_size;
-		need_k = (ind_i ^ 1) % por_size;
-		if (need_j == por_number)
-		{
-			memcpy(psign, &temp1[need_k], FIPS205_N);
-			psign += FIPS205_N;
-		}*/
+
 		++th;
 		//s /= 2;
 		r /= 2;
@@ -3029,248 +2605,6 @@ uint8_t* FIPS205_AVX_fors_sign_new_(uint8_t* sign, uint8_t* md, /*auth[FIPS205_K
 }
 #endif
 
-
-
-
-//uint8_t* FIPS205_AVX_fors_sign_and_PK(
-//	uint8_t* sign, 
-//	uint8_t *pk,
-//	const uint8_t* md, 
-//	const uint8_t* SK_seed, 
-//	const void* PK_256, 
-//	const void* PK_256_512, 
-//	uint8_t* adr)
-//{
-//	int i;
-//	__declspec (align (32))
-//		uint32_t ind[FIPS205_K] = { 0 };
-//	uint8_t for_pk[FIPS205_K * FIPS205_N]  ;
-//
-//	fors_base(ind, md, FIPS205_K);
-//
-//#pragma omp parallel for 
-//	for (i = 0; i < FIPS205_K; ++i)
-//	{
-//		__m256i perenos = _mm256_set1_epi32((i * (1 << FIPS205_A) >> 16));
-//		__m256i start_value = _mm256_add_epi32(step1_sll16, _mm256_set1_epi32((i * (1 << FIPS205_A)) << 16));
-//		uint8_t* psign = sign + i * FIPS205_N * (1 + FIPS205_A);
-//		uint32_t cur_ind = ind[i]; // _mm256_set1_epi32(ind[i] * (1 << i));
-//		__m256i in_block_for_prf[2];
-//		__m256i in_block_for_tree[2];
-//		uint32_t j;
-//		uint8_t* cur_pfor_pk = for_pk + i * FIPS205_N;
-//#if FIPS205_N == 16
-//		__m256i in_block_for_H[2];
-//		__m256i state;
-//#else
-//		__m256i in_block_for_H[4];
-//		__m256i state[2];
-//#endif
-//
-//		__m256i blocks_64_prf[64];
-//		__m256i blocks_64_tree[64];
-//
-//		
-//		FIPS205_AVX_fors_init_for_prf(in_block_for_prf, SK_seed, adr);
-//		FIPS205_AVX_fors_init_for_tree(in_block_for_tree, adr);
-//		FIPS205_AVX_fors_init_in_block0(in_block_for_H, adr);
-//
-//		__m256i temp[16];
-//
-//		memcpy(temp, in_block_for_prf, 2 * sizeof(__m256i));
-//		memcpy(temp + 2, temp, 2 * sizeof(__m256i));
-//		memcpy(temp + 4, temp, 4 * sizeof(__m256i));
-//		memcpy(temp + 8, temp, 8 * sizeof(__m256i));
-//
-//		uint32_t* temp32 = (uint32_t*)temp;
-//		for (j = 0; j < 16; ++j)
-//		{
-//			blocks_64_prf[j] = _mm256_i32gather_epi32((const int*)temp32++, idx16, 4);
-//
-//		}
-//		temp32 = (uint32_t*)temp;
-//
-//		memcpy(temp, in_block_for_tree, 2 * sizeof(__m256i));
-//		memcpy(temp + 2, temp, 2 * sizeof(__m256i));
-//		memcpy(temp + 4, temp, 4 * sizeof(__m256i));
-//		memcpy(temp + 8, temp, 8 * sizeof(__m256i));
-//
-//		for (j = 0; j < 16; ++j)
-//		{
-//			blocks_64_tree[j] = _mm256_i32gather_epi32((const int*)temp32++, idx16, 4);
-//
-//		}
-//
-//#if FIPS205_N == 16
-//		__m256i blocks_[64];
-//#else
-//		__m256i blocks_[80];
-//#endif
-//
-//		uint8_t* pblocks = (uint8_t*)in_block_for_H;
-//	
-//
-//		__m256i* temp1 = malloc(((1 << (FIPS205_A + 1)) * sizeof(__m256i))), * temp2 = temp1 + (1 << (FIPS205_A));
-//
-//
-//		uint32_t k = 0, l = 0, r = FIPS205_A;
-//
-//
-//
-//		__m256i t;
-//		uint32_t need_j = ind[i] / 8;
-//		uint32_t need_k = ind[i] % 8;
-//		uint32_t need_k_ = need_k ^ 1;
-//		uint32_t* block_keys_32;
-//
-//		for (j = 0; j < (1 << FIPS205_A) / 8; ++j)
-//		{
-//
-//			blocks_64_prf[4] = perenos;
-//			blocks_64_prf[5] = _mm256_or_si256(
-//				_mm256_and_si256(_mm256_set1_epi32(0x0000FFFF), blocks_64_prf[5]),
-//				start_value);
-//
-//
-//			memcpy(temp1 + 8 * j, (__m256i*)PK_256, 8 * sizeof(__m256i));
-//
-//
-//			AVX_sha256_compress8(temp1 + 8 * j, blocks_64_prf);
-//
-//			/*blocks_64_tree[4] = _mm256_or_si256(
-//				_mm256_and_si256(_mm256_set1_epi32(0xFFFF0000), blocks_64_tree[4]),
-//				perenos);*/
-//			blocks_64_tree[4] = perenos;
-//
-//			blocks_64_tree[5] = _mm256_or_si256(
-//				_mm256_and_si256(_mm256_set1_epi32(0x0000FFFF), blocks_64_tree[5]),
-//				start_value);
-//			replace_blocks_key8__(blocks_64_tree, temp1 + j * 8);
-//
-//			memcpy(temp2 + j * 8, (__m256i*)PK_256, 8 * sizeof(__m256i));
-//			
-//			AVX_sha256_compress8(temp2 + j * 8, blocks_64_tree);
-//
-//			start_value = _mm256_add_epi32(start_value, eight_256);
-//
-//
-//		}
-//
-//		block_keys_32 = (uint32_t*)(temp1 + 8 * need_j);
-//		for (k = 0; k < need_k; ++k)
-//		{
-//			t = _mm256_i32gather_epi32((const int*)block_keys_32++, idx8, 4);
-//		
-//		}
-//		t = _mm256_i32gather_epi32((const int*)block_keys_32++, idx8, 4);
-//		t = _mm256_shuffle_epi8(t, maska_for_shuffle_32);
-//		memcpy(psign, &t, FIPS205_N);
-//		psign += FIPS205_N;
-//
-//
-//		block_keys_32 = (uint32_t*)(temp2);
-//		uint8_t* dest = (uint8_t*)temp1;
-//		for (j = 0; j < (1 << FIPS205_A) / 8; ++j)
-//		{
-//
-//			block_keys_32 = (uint32_t*)(temp2 + 8 * j);
-//
-//			for (k = 0; k < 8; ++k)
-//			{
-//				t = _mm256_i32gather_epi32((const int*)block_keys_32++, idx8, 4);
-//				t = _mm256_shuffle_epi8(t, maska_for_shuffle_32);
-//				memcpy(dest, &t, FIPS205_N);
-//				dest += sizeof(__m256i);
-//			}
-//
-//		}
-//
-//
-//		memcpy(psign, temp1 + 8 * need_j + need_k_, FIPS205_N);
-//		psign += FIPS205_N;
-//
-//		// level 1 .. r - 1 
-//		r = 1 << FIPS205_A;
-//		uint32_t th = 1;
-//		uint32_t s = ind[i] ^ 1;
-//
-//		while (r != 2)
-//		{
-//			ind[i] /= 2;
-//			setTreeHeight(pblocks, th);
-//			uint32_t tree_ind_const = i * (1 << (FIPS205_A - th));
-//			for (k = 0; k < r / 2; ++k)
-//			{
-//				//uint32_t tree_ind_const = 1 << (FIPS205_A - th);
-//				setTreeIndex(pblocks, tree_ind_const + k);
-//				memcpy(pblocks + ADR_SIZE, &temp1[2 * k], FIPS205_N);
-//				memcpy(pblocks + ADR_SIZE + FIPS205_N, &temp1[2 * k + 1], FIPS205_N);
-//
-//
-//#if FIPS205_N == 16
-//				blocks_[0] = _mm256_shuffle_epi8(in_block_for_H[0], maska_for_shuffle_32);
-//				blocks_[1] = _mm256_shuffle_epi8(in_block_for_H[1], maska_for_shuffle_32);
-//				memcpy(&state, (uint8_t*)PK_256_512, sizeof(state));
-//				AVX_sha256_compress((uint32_t*)&state, blocks_);
-//				temp1[k] = _mm256_shuffle_epi8(state, maska_for_shuffle_32);
-//				//memcpy(temp[k], &state, FIPS205_N);
-//#else
-//				blocks_[0] = _mm256_shuffle_epi8(in_block_for_H[0], maska_for_shuffle_64);
-//				blocks_[1] = _mm256_shuffle_epi8(in_block_for_H[1], maska_for_shuffle_64);
-//				blocks_[2] = _mm256_shuffle_epi8(in_block_for_H[2], maska_for_shuffle_64);
-//				blocks_[3] = _mm256_shuffle_epi8(in_block_for_H[3], maska_for_shuffle_64);
-//				memcpy(state, (uint8_t*)PK_256_512, sizeof(state));
-//				AVX_sha512_compress((uint64_t*)state, blocks_);
-//				temp1[k] = _mm256_shuffle_epi8(state[0], maska_for_shuffle_64);
-//
-//#endif
-//			}
-//			memcpy(psign, &temp1[(ind[i] ^ 1)], FIPS205_N);
-//			psign += FIPS205_N;
-//
-//			++th;
-//			s /= 2;
-//			r /= 2;
-//		}
-//		setTreeHeight(pblocks, th);
-//		setTreeIndex(pblocks, i);
-//		memcpy(pblocks + ADR_SIZE, &temp1[0], FIPS205_N);
-//		memcpy(pblocks + ADR_SIZE + FIPS205_N, &temp1[1], FIPS205_N);
-//#if FIPS205_N == 16
-//		blocks_[0] = _mm256_shuffle_epi8(in_block_for_H[0], maska_for_shuffle_32);
-//		blocks_[1] = _mm256_shuffle_epi8(in_block_for_H[1], maska_for_shuffle_32);
-//		memcpy(&state, (uint8_t*)PK_256_512, sizeof(state));
-//		AVX_sha256_compress((uint32_t*)&state, blocks_);
-//		temp1[0] = _mm256_shuffle_epi8(state, maska_for_shuffle_32);
-//		//memcpy(temp[k], &state, FIPS205_N);
-//#else
-//		blocks_[0] = _mm256_shuffle_epi8(in_block_for_H[0], maska_for_shuffle_64);
-//		blocks_[1] = _mm256_shuffle_epi8(in_block_for_H[1], maska_for_shuffle_64);
-//		blocks_[2] = _mm256_shuffle_epi8(in_block_for_H[2], maska_for_shuffle_64);
-//		blocks_[3] = _mm256_shuffle_epi8(in_block_for_H[3], maska_for_shuffle_64);
-//		memcpy(state, (uint8_t*)PK_256_512, sizeof(state));
-//		AVX_sha512_compress((uint64_t*)state, blocks_);
-//		temp1[0] = _mm256_shuffle_epi8(state[0], maska_for_shuffle_64);
-//
-//#endif
-//		memcpy(cur_pfor_pk, temp1, FIPS205_N);
-//		free(temp1);
-//		//#endif
-//
-//	}
-//	
-//	uint8_t for_pk_adr[ADR_SIZE];// +FIPS205_K * FIPS205_N];
-//	// forspkADRS ← ADRS
-//	memcpy(for_pk_adr, adr, ADR_SIZE);
-//	//forspkADRS.setTypeAndClear(FORS_ROOTS)
-//	setType1(for_pk_adr, FORS_ROOTS);
-//	memset(for_pk_adr + 14, 0, 8);
-//	AVX_Tl_(pk, PK_256_512, for_pk_adr, for_pk, FIPS205_K);
-//	return sign + FIPS205_K * (1 + FIPS205_A) * FIPS205_N;
-//}
-
-
-
 uint8_t* FIPS205_AVX_fors_sign_new__(uint8_t* sign, uint8_t* md, /*auth[FIPS205_K][FIPS205_A][FIPS205_N], */const uint8_t* SK_seed, const void* PK_256, const void* PK_256_512, /*__m256i in64[2], */uint8_t* adr)
 {
 	int i;
@@ -3406,9 +2740,6 @@ uint8_t* FIPS205_AVX_fors_sign_new__(uint8_t* sign, uint8_t* md, /*auth[FIPS205_
 
 		for (j = 0; j < (1 << FIPS205_A) / 8; ++j)
 		{
-			/*blocks_64_prf[4] = _mm256_or_si256(
-				_mm256_and_si256(_mm256_set1_epi32(0xFFFF0000), blocks_64_prf[4]),
-				perenos);*/
 			blocks_64_prf[4] = perenos;
 			blocks_64_prf[5] = _mm256_or_si256(
 				_mm256_and_si256(_mm256_set1_epi32(0x0000FFFF), blocks_64_prf[5]),
@@ -3443,9 +2774,6 @@ uint8_t* FIPS205_AVX_fors_sign_new__(uint8_t* sign, uint8_t* md, /*auth[FIPS205_
 		for (k = 0; k < need_k; ++k)
 		{
 			t = _mm256_i32gather_epi32((const int*)block_keys_32++, idx8, 4);
-			//t = _mm256_shuffle_epi8(t, maska_for_shuffle_32);
-			/*memcpy(dest, &t, FIPS205_N);
-			dest += sizeof(__m256i);*/
 		}
 		t = _mm256_i32gather_epi32((const int*)block_keys_32++, idx8, 4);
 		t = _mm256_shuffle_epi8(t, maska_for_shuffle_32);
@@ -3833,11 +3161,6 @@ void FIPS205_AVX_fors_pkFromSig_new__(
 
 		__m256i blocks_64_tree[64];
 
-		//__m256i temp;
-
-		//FIPS205_AVX_fors_init_for_tree(in_block_for_tree, adr);
-		//blocks_64_tree[0] = _mm256_setzero_si256();
-		//blocks_64_tree[1] = _mm256_setzero_si256();
 		memcpy(blocks_64_tree, in_block_for_tree, 2 * sizeof(__m256i));
 		uint8_t* p = (uint8_t*)blocks_64_tree;
 		setTreeIndex(p, (i * (1 << FIPS205_A) + ind[i]));
@@ -3848,18 +3171,7 @@ void FIPS205_AVX_fors_pkFromSig_new__(
 		memcpy(&local_sk, PK_seed, sizeof(__m256i));
 		AVX_sha256_compress((uint32_t*)&local_sk, blocks_64_tree);
 		local_sk = _mm256_shuffle_epi8(local_sk, maska_for_shuffle_32);
-		
-//#if FIPS205_H == 16
-//		blocks_H[0] = _mm256_shuffle_epi8(in_block_for_H[0], maska_for_shuffle_32);
-//		blocks_H[1] = _mm256_shuffle_epi8(in_block_for_H[1], maska_for_shuffle_32);
-//#else
-//		blocks_H[0] = _mm256_shuffle_epi8(in_block_for_H[0], maska_for_shuffle_64);
-//		blocks_H[1] = _mm256_shuffle_epi8(in_block_for_H[1], maska_for_shuffle_64);
-//		blocks_H[2] = _mm256_shuffle_epi8(in_block_for_H[2], maska_for_shuffle_64);
-//		blocks_H[3] = _mm256_shuffle_epi8(in_block_for_H[3], maska_for_shuffle_64);
-//#endif
-
-		
+			
 		p = (uint8_t*)blocks_H;
 		__m256i first = local_sk;
 		uint32_t indi = ind[i];
@@ -3921,6 +3233,4 @@ void FIPS205_AVX_fors_pkFromSig_new__(
 	memset(forspkADRS + ADR_SIZE - 8, 0, 8);
 
 	AVX_Tl(pkFromSig, PK_seed_, forspkADRS, dest, FIPS205_K);
-
-
 }
