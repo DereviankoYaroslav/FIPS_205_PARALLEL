@@ -617,22 +617,6 @@ SUCCESS JsonKeyGen(PJSON_TEST_GROUP groups, int groups_count)
 			for (j = 0; j < tests; ++j)
 			{
 				success = ReadJsonKeyGen(sk_read, pk_read, PKseed, SKseed, SKprf, groups[i].tests);
-				//#ifdef _PREDCALC
-				//
-				//				predcalc_pk_sha256(predcalc_pk_256, PKseed);
-				//#if N == 24 
-				//
-				//				predcalc_pk_sha512(predcalc_pk_384, PKseed);
-				//				uint64_t* predcalc_pk = predcalc_pk_384;
-				//#endif
-				//#if N == 32 
-				//
-				//				predcalc_pk_sha512(predcalc_pk_512, PKseed);
-				//				uint64_t* predcalc_pk = predcalc_pk_512;
-				//#endif
-				//
-				//
-				//#endif
 
 				if (success == OK)
 				{
