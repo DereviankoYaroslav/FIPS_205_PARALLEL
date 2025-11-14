@@ -65,136 +65,6 @@ ALIGN64 static const uint64_t k[] =
             0x5fcb6fab3ad6faec, 0x6c44198c4a475817, 
 };
 
-//int test_fun_256()
-//{
-//    __declspec (align(64)) uint64_t a[4], res1[4], res2[4];
-//    __declspec (align(64)) uint64_t w[64];
-//
-//    __m256i* a256 = (__m256i*)a;
-//    __m256i* res1_256 = (__m256i*)res1;
-//    __m256i* res2_256 = (__m256i*)res2;
-//
-//    srand(0);
-//    int res = 0;
-//    for (int i = 0; i < 256; ++i)
-//    {
-//
-//        for (int j = 0; j < 16; ++j)
-//            w[j] = rand64();
-//        for (int j = 0; j < 4; ++j)
-//            a[j] = rand64();
-//
-//        for (int j = 0; j < 4; ++j)
-//        {
-//            res1[j] = ROR64(a[j], 14);
-//
-//        }
-//
-//        //*res2_256 = ROR64_256 (*a256, n14, n14_);
-//        /*temp1 = _mm256_srl_epi64(*a256, n14);
-//        temp2 = _mm256_srl_epi64(*a256, n14_);
-//        *res2_256 = _mm256_or_si256(_mm256_srl_epi64(*a256, n14), _mm256_srl_epi64(*a256, n14_));*/
-//        *res2_256 = ROR64_256(*a256, n14, n14_);
-//
-//        res |= memcmp(res1, res2, 32);
-//        if (res)
-//        {
-//            printf("ROR64 and ROTR_256 ? %s\n", res == 0 ? "OK" : "ERROR");
-//            break;
-//        }
-//
-//        for (int j = 0; j < 4; ++j)
-//        {
-//            res1[j] = SHR64(a[j], 6);
-//        }
-//        
-//        *res2_256 = SHR64_256 (*a256, 6);
-//
-//        res = memcmp(res1, res2, 32);
-//        if (res)
-//        {
-//            printf("SHR64 and SHR64_256 ? %s\n", res == 0 ? "OK" : "ERROR");
-//            break;
-//        }
-//
-//        for (int j = 0; j < 4; ++j)
-//            res1[j] = s1(a[j]);
-//        *res2_256 = s1_256(*a256);
-//        
-//        res = memcmp(res1, res2, 16);
-//        if (res)
-//        {
-//            printf("s1 and s1_128 ? %s\n", res == 0 ? "OK" : "ERROR");
-//            break;
-//        }
-//
-//        for (int j = 0; j < 4; ++j)
-//            res1[j] = s0(a[j]);
-//        *res2_256 = s0_256(*a256);
-//        res = memcmp(res1, res2, 16);
-//        if (res)
-//        {
-//            printf("s0 and s0_128 ? %s\n", res == 0 ? "OK" : "ERROR");
-//            break;
-//        }
-//
-//
-//        for (int j = 0; j < 4; ++j)
-//            res1[j] = S1(a[j]);
-//        *res2_256 = S1_256(*a256);
-//        res = memcmp(res1, res2, 16);
-//        if (res)
-//        {
-//            printf("S1 and S1_128 ? %s\n", res == 0 ? "OK" : "ERROR");
-//            break;
-//        }
-//
-//        for (int j = 0; j < 4; ++j)
-//            res1[j] = S0(a[j]);
-//        *res2_256 = S0_256(*a256);
-//        res = memcmp(res1, res2, 16);
-//        if (res)
-//        {
-//            printf("S0 and S0_128 ? %s\n", res == 0 ? "OK" : "ERROR");
-//            break;
-//        }
-//
-//        //ch_128(e, f, g)
-//        uint64_t e = 1, f = 2, g = 3;
-//        __m256i e256 = _mm256_set1_epi64x(e);
-//        __m256i f256 = _mm256_set1_epi64x(f);
-//        __m256i g256 = _mm256_set1_epi64x(g);
-//        for (int i = 0; i < 4; ++i)
-//            res1[i] = ch(e, f, g);
-//        *res2_256 = ch_256(e256, f256, g256);
-//        res = memcmp(res1, res2, 32);
-//        if (res)
-//        {
-//            printf("ch and ch_256 ? %s\n", res == 0 ? "OK" : "ERROR");
-//            break;
-//        }
-//
-//        // maj_256(a, b, c)
-//        for (int i = 0; i < 4; ++i)
-//            res1[i] = maj(e, f, g);
-//        *res2_256 = maj_256(e256, f256, g256);
-//
-//        res = memcmp(res1, res2, 16);
-//        if (res)
-//        {
-//            printf("maj and maj_256 ? %s\n", res == 0 ? "OK" : "ERROR");
-//            break;
-//        }
-//
-//
-//
-//
-//
-//    }
-//    return res;
-//
-//}
-
 #define DO(w) \
     temp1 = h + S1(e) + ch(e, f, g) + w;    \
     temp2 = S0(a) + maj(a, b, c);           \
@@ -206,21 +76,6 @@ ALIGN64 static const uint64_t k[] =
     c = b;\
     b = a;\
     a = temp1 + temp2
-
-//#define DO_256(w) \
-//    temp1 = \
-//    _mm256_add_epi64 (                              \
-//        _mm256_add_epi64 (h, S1_256(e)),            \
-//        _mm256_add_epi64 (ch_256(e, f, g) ,  w));   \
-//    temp2 = _mm256_add_epi64 (S0_256(a), maj_256(a, b, c));               \
-//    h = g;  \
-//    g = f;  \
-//    f = e;  \
-//    e = _mm256_add_si64(d, temp1);\
-//    d = c;\
-//    c = b;\
-//    b = a;\
-//    a = _mm256_add_epi64(temp1 , temp2)
 
 #define DO_256(w) \
     temp1 = \
@@ -257,8 +112,6 @@ void do_fun_512(uint64_t* a_, uint64_t* b_, uint64_t* c_, uint64_t* d_,
     *a_ = a; *b_ = b; *c_ = c; *d_ = d;
     *e_ = e; *f_ = f; *g_ = g; *h_ = h;
 }
-
-
 
 
 void AVX_sha512_compress(uint64_t* state, __m256i*w_)
@@ -823,102 +676,102 @@ void calc_state(uint64_t *state, const uint64_t *w)
 
 
 
-uint64_t temp1, temp2;
-DO(w[0]);
-DO(w[1]);
-DO(w[2]);
-DO(w[3]);
-DO(w[4]);
-DO(w[5]);
-DO(w[6]);
-DO(w[7]);
-DO(w[8]);
-DO(w[9]);
-DO(w[10]);
-DO(w[11]);
-DO(w[12]);
-DO(w[13]);
-DO(w[14]);
-DO(w[15]);
+    uint64_t temp1, temp2;
+    DO(w[0]);
+    DO(w[1]);
+    DO(w[2]);
+    DO(w[3]);
+    DO(w[4]);
+    DO(w[5]);
+    DO(w[6]);
+    DO(w[7]);
+    DO(w[8]);
+    DO(w[9]);
+    DO(w[10]);
+    DO(w[11]);
+    DO(w[12]);
+    DO(w[13]);
+    DO(w[14]);
+    DO(w[15]);
 
-DO(w[16]);
-DO(w[17]);
-DO(w[18]);
-DO(w[19]);
-DO(w[20]);
-DO(w[21]);
-DO(w[22]);
-DO(w[23]);
-DO(w[24]);
-DO(w[25]);
-DO(w[26]);
-DO(w[27]);
-DO(w[28]);
-DO(w[29]);
-DO(w[30]);
-DO(w[31]);
+    DO(w[16]);
+    DO(w[17]);
+    DO(w[18]);
+    DO(w[19]);
+    DO(w[20]);
+    DO(w[21]);
+    DO(w[22]);
+    DO(w[23]);
+    DO(w[24]);
+    DO(w[25]);
+    DO(w[26]);
+    DO(w[27]);
+    DO(w[28]);
+    DO(w[29]);
+    DO(w[30]);
+    DO(w[31]);
 
-DO(w[32]);
-DO(w[33]);
-DO(w[34]);
-DO(w[35]);
-DO(w[36]);
-DO(w[37]);
-DO(w[38]);
-DO(w[39]);
-DO(w[40]);
-DO(w[41]);
-DO(w[42]);
-DO(w[43]);
-DO(w[44]);
-DO(w[45]);
-DO(w[46]);
-DO(w[47]);
-//
-DO(w[48]);
-DO(w[49]);
-DO(w[50]);
-DO(w[51]);
-DO(w[52]);
-DO(w[53]);
-DO(w[54]);
-DO(w[55]);
-DO(w[56]);
-DO(w[57]);
-DO(w[58]);
-DO(w[59]);
-DO(w[60]);
-DO(w[61]);
-DO(w[62]);
-DO(w[63]);
+    DO(w[32]);
+    DO(w[33]);
+    DO(w[34]);
+    DO(w[35]);
+    DO(w[36]);
+    DO(w[37]);
+    DO(w[38]);
+    DO(w[39]);
+    DO(w[40]);
+    DO(w[41]);
+    DO(w[42]);
+    DO(w[43]);
+    DO(w[44]);
+    DO(w[45]);
+    DO(w[46]);
+    DO(w[47]);
+    //
+    DO(w[48]);
+    DO(w[49]);
+    DO(w[50]);
+    DO(w[51]);
+    DO(w[52]);
+    DO(w[53]);
+    DO(w[54]);
+    DO(w[55]);
+    DO(w[56]);
+    DO(w[57]);
+    DO(w[58]);
+    DO(w[59]);
+    DO(w[60]);
+    DO(w[61]);
+    DO(w[62]);
+    DO(w[63]);
 
-DO(w[64]);
-DO(w[65]);
-DO(w[66]);
-DO(w[67]);
-DO(w[68]);
-DO(w[69]);
-DO(w[70]);
-DO(w[71]);
-DO(w[72]);
-DO(w[73]);
-DO(w[74]);
-DO(w[75]);
-DO(w[76]);
-DO(w[77]);
-DO(w[78]);
-DO(w[79]);
+    DO(w[64]);
+    DO(w[65]);
+    DO(w[66]);
+    DO(w[67]);
+    DO(w[68]);
+    DO(w[69]);
+    DO(w[70]);
+    DO(w[71]);
+    DO(w[72]);
+    DO(w[73]);
+    DO(w[74]);
+    DO(w[75]);
+    DO(w[76]);
+    DO(w[77]);
+    DO(w[78]);
+    DO(w[79]);
 
 
 
-state[0] += a;
-state[1] += b;
-state[2] += c;
-state[3] += d;
-state[4] += e;
-state[5] += f;
-state[6] += g;
-state[7] += h;
+    state[0] += a;
+    state[1] += b;
+    state[2] += c;
+    state[3] += d;
+    state[4] += e;
+    state[5] += f;
+    state[6] += g;
+    state[7] += h;
 }
 
 void AVX_PREDCALC_W_sha512_(uint8_t* out, const uint64_t* pk, const uint8_t* in, uint32_t in_len, uint32_t out_len)
@@ -933,7 +786,6 @@ void AVX_PREDCALC_W_sha512_(uint8_t* out, const uint64_t* pk, const uint8_t* in,
 
     memcpy(state, pk, sizeof(state));
 
-    
     //const __m256i maska = _mm256_load_si256((const __m256i*)u8_maska_512);
     //__m256i in256[16];
     __m256i temp256[80];
@@ -1110,34 +962,6 @@ void AVX_sha512_device(uint8_t* hash, const uint8_t* in, uint32_t in_len, uint32
     // Not defined
 }
 
-// inlen < 56
-// pk_seed ||
-//void AVX_sha512_predcalc_pk_(uint64_t* state, const uint8_t* in, uint32_t in_len)
-//{
-//    memcpy(state, HInit, sizeof(HInit));
-//    __declspec (align (64))
-//        uint8_t temp[128];
-//    memcpy(temp, in, in_len);
-//    memset(temp + in_len, 0, 128 - in_len);
-//    //const __m256i maska = _mm256_load_si256((const __m256i*)u8_maska_512);
-//#if 0
-//    __m256i* temp256 = (__m256i*)temp;
-//    temp256[0] = _mm256_shuffle_epi8(temp256[0], maska);
-//    temp256[1] = _mm256_shuffle_epi8(temp256[1], maska);
-//    temp256[2] = _mm256_shuffle_epi8(temp256[2], maska);
-//    temp256[3] = _mm256_shuffle_epi8(temp256[3], maska);
-//    AVX_sha512_compress(state, temp256);
-//#else
-//    __m256i w [20];
-//    memcpy(w, temp, 128);
-//    w[0] = _mm256_shuffle_epi8(w[0], maska_for_shuffle_64);
-//    w[1] = _mm256_shuffle_epi8(w[1], maska_for_shuffle_64);
-//    w[2] = _mm256_shuffle_epi8(w[2], maska_for_shuffle_64);
-//    w[3] = _mm256_shuffle_epi8(w[3], maska_for_shuffle_64);
-//    AVX_sha512_compress(state, w);
-//
-//#endif
-//}
 // blocks
 void AVX_sha512_predcalc_pk_(__m256i state256[8], const uint8_t* in)
 {
@@ -1238,58 +1062,7 @@ void AVX_sha512_WITH_PREDCALC(uint8_t* hash, const uint64_t* state, const uint8_
     state_256[1] = _mm256_shuffle_epi8(state_256[1], maska_for_shuffle_64);
     memcpy(hash, state_256, out_len);
 }
-//void HMAC512(uint8_t* dest, const uint8_t* sk, uint32_t sk_len, const uint8_t* src, uint32_t len)
-//{
-//
-//#define	BLOCKSIZE	128
-//
-//    uint8_t buf[BLOCKSIZE + BLOCKSIZE / 2]; // oKey
-//    uint8_t* temp = malloc(BLOCKSIZE + len);    //      ikey
-//    if (temp)
-//    {
-//        uint32_t i;
-//
-//        for (i = 0; i < sk_len; ++i)
-//        {
-//            temp[i] = sk[i] ^ 0x36;
-//        }
-//
-//        for (i = 0; i < BLOCKSIZE - sk_len; ++i)
-//        {
-//            temp[sk_len + i] = 0x36;
-//        }
-//        for (i = 0; i < len; i++)
-//            temp[BLOCKSIZE + i] = src[i];
-//
-//        for (i = 0; i < sk_len; ++i)
-//        {
-//            buf[i] = sk[i] ^ 0x5C;
-//        }
-//
-//        for (i = 0; i < BLOCKSIZE - sk_len; ++i)
-//        {
-//            buf[sk_len + i] = 0x5C;
-//        }
-//
-//
-//        //cur += BLOCKSIZE - N;
-//
-//
-//
-//        sha512(buf + BLOCKSIZE, temp, BLOCKSIZE + len);
-//        sha512(temp, buf, BLOCKSIZE + BLOCKSIZE / 2);
-//
-//
-//        for (i = 0; i < 64; ++i)
-//        {
-//            dest[i] = temp[i];
-//        }
-//
-//        free(temp);
-//    }
-//
-//
-//}
+
 void AVX_HMAC512(uint8_t* dest, const uint8_t* sk, uint32_t sk_len, const uint8_t* src, uint32_t len, uint32_t dest_len )
 {
     #define	BLOCKSIZE	128
@@ -1336,30 +1109,6 @@ void AVX_HMAC512(uint8_t* dest, const uint8_t* sk, uint32_t sk_len, const uint8_
 
 }
 
-//int test_AVX_HMAC512()
-//{
-//    uint8_t dest1[FIPS205_N], dest2[FIPS205_N];
-//    uint8_t sk[FIPS205_N];
-//    uint32_t sk_len = FIPS205_N, dest_len = FIPS205_N, src_len, i;
-//    uint8_t* src;
-//    srand(0);
-//    src_len = rand () + 1;
-//    src = malloc(src_len);
-//    for (i = 0; i < src_len; ++i)
-//        src[i] = rand();
-//        
-//    for (i = 0; i < sk_len; ++i)
-//        sk[i] = rand() %256;
-//    HMAC512(dest1, sk, sk_len, src, src_len, FIPS205_N);
-//    AVX_HMAC512(dest2, sk, sk_len, src, src_len, FIPS205_N);
-//    int res = memcmp(dest1, dest2, FIPS205_N);
-//    return res;
-//
-//
-//}
-
-
-
 void AVX_MGF1_sha512(
     uint8_t* out,
     uint32_t outlen,
@@ -1389,71 +1138,6 @@ void AVX_MGF1_sha512(
     }
     free(inbuf);
 }
-
-//int test_AVX_sha512()
-//{
-//    uint8_t in[] = "abc";
-//    uint8_t h1[64], h2[64];
-//    sha512(h1, in, 3, 64);
-//    AVX_sha512(h2, in, 3, 64);
-//    int res = memcmp(h1, h2, 64);
-//    return res;
-//
-//}
-
-/*
-void AVX_MGF1_sha512(
-    uint8_t* out,
-    uint32_t outlen,
-    const uint8_t* in,
-    uint32_t inlen)
-*/
-//int test_AVX_MGF1_sha512()
-//{
-//    int res = 0;
-//    
-//
-//    if (FIPS205_N > 16)
-//    {
-//        uint8_t PK_seed[FIPS205_N], R[FIPS205_N], Msg[64], in[2 * FIPS205_N + 64];
-//        for (int i = 0; i < FIPS205_N; ++i)
-//        {
-//            PK_seed[i] = rand() % 8;
-//            R[i] = rand() % 8;
-//        }
-//
-//        for (int i = 0; i < 64; ++i)
-//        {
-//            Msg[i] = rand() % 8;
-//        }
-//        memcpy(in, R, FIPS205_N);
-//        memcpy(in + FIPS205_N, PK_seed, FIPS205_N);
-//        memcpy(in + 2 * FIPS205_N, Msg, 64);
-//
-//        uint8_t out1[FIPS205_M], out2[FIPS205_M];
-//        
-//        MGF1_sha512(
-//            out1,
-//            FIPS205_M,
-//            in,
-//            sizeof(in));
-//        
-//        AVX_MGF1_sha512(
-//            out2,
-//            FIPS205_M,
-//            in,
-//            sizeof(in));
-//        for (int i = 0; i < FIPS205_M; ++i)
-//        {
-//            if (out1[i] != out2[i])
-//                res = 1;
-//        }
-//    }
-//    
-//    return res;
-//}
-
-
 
 void AVX_sha512_compress4(__m256i* state256, __m256i* w/*__m256i* block256*/)
 {
@@ -1692,82 +1376,6 @@ AVX_sha512_calc_w4(w/*, block256*/);
     state256[7] = _mm256_add_epi64(state256[7], h);
 }
 
-//int test_AVX_sha512_compress4()
-//{
-//    __m256i state_256[8];
-//    __m256i block_256[16];
-//    uint64_t state[4][8], block[4][16];
-//    srand(0);
-//    for (int i = 0; i < 8; ++i)
-//        for (int j = 0; j < 4; ++j)
-//            state_256[i].m256i_u64[j] = rand64();
-//    for (int i = 0; i < 16; ++i)
-//        for (int j = 0; j < 4; ++j)
-//            block_256[i].m256i_u64[j] = rand64();
-//
-//    for (int i = 0; i < 4; ++i)
-//    {
-//        for (int j = 0; j < 8; ++j)
-//        {
-//            state[i][j] = state_256[j].m256i_i64[i];
-//        }
-//
-//        for (int j = 0; j < 16; ++j)
-//        {
-//            block[i][j] = block_256[j].m256i_i64[i];
-//        }
-//
-//        //  AVX_sha256_compress(state[i], block[i]);
-//    }
-//#ifndef _DEBUG
-//    min_tacts = 0xFFFFFFFFFFFFFFFF;
-//    for (int k = 0; k < 256; ++k)
-//    {
-//        tacts = __rdtsc();
-//#endif
-//
-//        for (int i = 0; i < 4; ++i)
-//            AVX_sha512_compress(state[i], (__m256i*)block[i]);
-//#ifndef _DEBUG
-//
-//        tacts = __rdtsc() - tacts;
-//        if (tacts < min_tacts)
-//            min_tacts = tacts;
-//    }
-//    printf("AVX_sha512_compress for 4 hashs time = %I64d\n ", min_tacts);
-//#endif
-//
-//#ifndef _DEBUG
-//    min_tacts = 0xFFFFFFFFFFFFFFFF;
-//    for (int k = 0; k < 256; ++k)
-//    {
-//        tacts = __rdtsc();
-//#endif
-//
-//        AVX_sha512_compress4(state_256, block_256);
-//
-//#ifndef _DEBUG
-//
-//        tacts = __rdtsc() - tacts;
-//        if (tacts < min_tacts)
-//            min_tacts = tacts;
-//    }
-//    printf("AVX_sha512_compress4 for 4 hashs time = %I64d\n ", min_tacts);
-//#endif
-//
-//    int res = 0;
-//    for (int i = 0; i < 4; ++i)
-//    {
-//        for (int j = 0; j < 8; ++j)
-//        {
-//            if (state_256[j].m256i_u64[i] != state[i][j])
-//                res = 1;
-//        }
-//
-//    }
-//    return res;
-//}
-
 static void toConvert64(__m256i dest_[16], uint64_t src[16 * 4], uint32_t size)
 {
 
@@ -1796,11 +1404,6 @@ void AVX_sha512_WITH_PREDCALC4(uint8_t hash[4][FIPS205_N], const uint64_t state[
     memcpy(temp[1], in[1], inlen);
     memcpy(temp[2], in[2], inlen);
     memcpy(temp[3], in[3], inlen);
-
-    /*temp[0][inlen] =
-        temp[1][inlen] =
-        temp[2][inlen] =
-        temp[3][inlen] = 0x80;*/
 
     uint8_t padded[128 - 2 * FIPS205_N - ADR_SIZE] = {0};
     padded[0] = 0x80;
@@ -1841,16 +1444,7 @@ void AVX_sha512_WITH_PREDCALC4(uint8_t hash[4][FIPS205_N], const uint64_t state[
     temp256[3][2] = _mm256_shuffle_epi8(temp256[3][2], maska_for_shuffle_64);
     temp256[3][3] = _mm256_shuffle_epi8(temp256[3][3], maska_for_shuffle_64);
 
-    /**temp256 [1]    = _mm256_shuffle_epi8(*temp256[1], maska_for_shuffle_64);
-    *temp256 [2]     = _mm256_shuffle_epi8(*temp256[2], maska_for_shuffle_64);
-    *temp256 [3]     = _mm256_shuffle_epi8(*temp256[3], maska_for_shuffle_64);*/
-
-       
-    
     __m256i in256[80], state256[8];
-
-    
-    //toConvert64(in256, temp, 16);
 
     __m128i step = _mm_set1_epi32(1);
     __m128i idx = _mm_setr_epi32(0, 16, 32, 48);
@@ -1890,18 +1484,6 @@ void AVX_sha512_WITH_PREDCALC4(uint8_t hash[4][FIPS205_N], const uint64_t state[
 
     idx = _mm_setr_epi32(0, 4, 8, 12);
 
-    //for (int i = 0; i < 4; ++i)
-    //{
-    //    ind2 = ind1;
-    //    //for (int j = 0; j < 4; ++j)
-    //    //{
-    //    in256[i * 4 ] = _mm256_i32gather_epi64((uint64_t*)state256, ind2, 8);
-    //    ind2 = _mm_add_epi32(ind2, step1);
-    //    in256[i * 4 + 1] = _mm256_i32gather_epi64((uint64_t*)state256, ind2, 8);
-    //    ind1 = _mm_add_epi32(ind1, step2);
-    //}
-
-    //ind2 = ind1;
     in256[0] = _mm256_i32gather_epi64((uint64_t*)state256, idx, 8);
     idx = _mm_add_epi32(idx, step);
     in256[1] = _mm256_i32gather_epi64((uint64_t*)state256, idx, 8);
@@ -1911,18 +1493,10 @@ void AVX_sha512_WITH_PREDCALC4(uint8_t hash[4][FIPS205_N], const uint64_t state[
     in256[3] = _mm256_i32gather_epi64((uint64_t*)state256, idx, 8);
         
     in256[0] = _mm256_shuffle_epi8(in256[0], maska_for_shuffle_64);
-    //in256[1] = _mm256_shuffle_epi8(in256[1], maska);
-    //in256[2] = _mm256_shuffle_epi8(in256[2], maska);
-    //in256[3] = _mm256_shuffle_epi8(in256[2], maska);
     in256[1] = _mm256_shuffle_epi8(in256[1], maska_for_shuffle_64);
-    //in256[5] = _mm256_shuffle_epi8(in256[5], maska);
-    //in256[6] = _mm256_shuffle_epi8(in256[2], maska);
-    //in256[7] = _mm256_shuffle_epi8(in256[2], maska);
-
     in256[2] = _mm256_shuffle_epi8(in256[2], maska_for_shuffle_64);
-    //in256[9] = _mm256_shuffle_epi8(in256[1], maska);
-
     in256[3] = _mm256_shuffle_epi8(in256[3], maska_for_shuffle_64);
+
     memcpy(hash[0], in256, FIPS205_N);
     memcpy(hash[1], in256 + 1, FIPS205_N);
     memcpy(hash[2], in256 + 2, FIPS205_N);
@@ -1952,8 +1526,6 @@ void AVX_sha512_predcalc_pk(uint64_t* state64, const uint8_t* in)
     temp256[2] = _mm256_shuffle_epi8(temp256[2], maska_for_shuffle_64);
     temp256[3] = _mm256_shuffle_epi8(temp256[3], maska_for_shuffle_64);
     AVX_sha512_compress(state64, temp256);
-
-
 }
 
 void AVX_sha512_one_block(uint8_t* out, uint64_t* predcalc, uint8_t* in, size_t inlen, size_t out_len)
@@ -1990,58 +1562,3 @@ void AVX_sha512_one_block(uint8_t* out, uint64_t* predcalc, uint8_t* in, size_t 
     state_256[0] = _mm256_shuffle_epi8(state_256[0], maska_for_shuffle_64);
     memcpy(out, state, out_len);
 }
-
-//int test_AVX_sha512_WITH_PREDCALC4()
-//{
-//    int res = 0;
-//    uint8_t PK_seed[FIPS205_N], M[4][2 * FIPS205_N], adr[4][ADR_SIZE];
-//    uint8_t h1[4][FIPS205_N], h2[4][FIPS205_N];
-//    for (int i = 0; i < FIPS205_N; ++i)
-//        PK_seed[i] = rand() % 8;
-//    for (int j = 0; j < 4; ++j)
-//        for (int i = 0; i < 2 * FIPS205_N; ++i)
-//            M[j][i] = rand() % 8;
-//    for (int j = 0; j < 4; ++j)
-//        for (int i = 0; i < ADR_SIZE; ++i)
-//            adr[j][i] = rand() % 8;
-//    uint64_t state[8];
-//    AVX_sha512_PREDCALC_VALUE(state, PK_seed, FIPS205_N);
-//    uint8_t in[4][ADR_SIZE + 2 * FIPS205_N];
-//    for (int j = 0; j < 4; ++j)
-//    {
-//        memcpy(in[j], adr[j], ADR_SIZE);
-//        memcpy(in[j] + ADR_SIZE, M[j], 2 * FIPS205_N);
-//    }
-//#ifndef _DEBUG
-//    min_tacts = 0xFFFFFFFFFFFFFFFF;
-//    for (int i = 0; i < 256; ++i)
-//    {
-//        tacts = __rdtsc();
-//#endif
-//        for (int j = 0; j < 4; ++j)
-//            AVX_sha512_WITH_PREDCALC(h1[j], state, in[j], ADR_SIZE + 2 * FIPS205_N, FIPS205_N);
-//#ifndef _DEBUG
-//        tacts = __rdtsc() - tacts;
-//        if (tacts < min_tacts)
-//            min_tacts = tacts;
-//    }
-//    printf("AVX_sha512_WITH_PREDCALC time = %I64d\n", min_tacts);
-//#endif
-//#ifndef _DEBUG
-//    min_tacts = 0xFFFFFFFFFFFFFFFF;
-//    for (int i = 0; i < 256; ++i)
-//    {
-//        tacts = __rdtsc();
-//#endif
-//    AVX_sha512_WITH_PREDCALC4(h2, state, in);
-//#ifndef _DEBUG
-//    tacts = __rdtsc() - tacts;
-//    if (tacts < min_tacts)
-//        min_tacts = tacts;
-//    }
-//    printf("AVX_sha512_WITH_PREDCALC4 time = %I64d\n", min_tacts);
-//#endif
-//    res = memcmp(h1, h2, sizeof(h1));
-//    return res;
-//}
-
