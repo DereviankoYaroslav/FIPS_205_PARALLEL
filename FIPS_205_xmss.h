@@ -70,18 +70,6 @@ void xmss_node_(uint8_t* PK_root, const uint8_t* SK_seed, size_t /*target_node_i
 #endif
 	uint8_t* adr);
 
-//void xmss_node_not_recurse_(
-//	uint8_t* PK_root,
-//	const uint8_t* SK_seed,
-//	size_t  ii,
-//	size_t z_,
-//#ifdef SHAKE
-//	const uint8_t* PK_seed,
-//#else
-//	const void* PK_seed,
-//	const void* PK_seed_n,
-//#endif
-//	uint8_t* adr);
 void xmss_node_not_recurse__(
 	uint8_t* PK_root,
 	const uint8_t* SK_seed,
