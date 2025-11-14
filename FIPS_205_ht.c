@@ -20,9 +20,6 @@ uint8_t* FIPS205_AVX_ht_sign(uint8_t* pSig, const uint8_t* M, const uint8_t* SK_
 		// leaf index idxleaf.
 	//Output: HT signature SIG𝐻𝑇.
 	// 1: ADRS ← toByte(0, 32)
-//#ifdef _GETTIME
-//	uint64_t tacts = __rdtsc();
-//#endif
 
 	uint8_t adr[ADR_SIZE] = { 0 };
 
@@ -149,45 +146,14 @@ SUCCESS FIPS205_AVX_ht_verify(
 	// 3: SIG𝑡𝑚𝑝 ← SIG𝐻𝑇.getXMSSSignature(0) ▷ SIG𝐻𝑇[0 ∶ (ℎ′ + 𝑙𝑒𝑛) ⋅ 𝑛]
 	uint8_t node[FIPS205_N];
 	// 4: 𝑛𝑜𝑑𝑒 ← xmss_pkFromSig(𝑖𝑑𝑥𝑙𝑒𝑎𝑓, SIG𝑡𝑚𝑝, 𝑀,PK.seed,ADRS)
-/*#ifndef _DEBUG
-	uint64_t tacts, mintacts;
-	mintacts = 0xFFFFFFFFFFFFFFFF;
-	for (int i = 0; i < 5; ++i)
-	{
-		memset(adr, 0, sizeof(adr));
-*/
-//#ifdef SHAKE
-//		SetAddress8(adr, TreeAddressOFFSET, idxtree);
-//#else
-//		ShortSetAddress8(adr, ShortTreeAddressOFFSET, idxtree);
-//#endif
-//		tacts = __rdtsc();
-//#endif
+
 #ifdef SHAKE
 	xmss_pkFromSig__OLD(node, idxleaf, SIGtmp, MSG, PK_seed, adr);
 #else
 	FIPS205_AVX_xmss_pkFromSig(node, idxleaf, SIGtmp, MSG,
 		PK_seed, PK_seed_n, adr);
-	////#if FIPS205_N == 16
-	////			predcalc_pk_256,
-	////#endif
-	////#if FIPS205_N == 24
-	////			predcalc_pk_384,
-	////#endif
-	////#if FIPS205_N == 32
-	////			predcalc_pk_512,
-	////#endif
-	//
-	//			adr);
+	
 #endif
-//#ifndef _DEBUG
-//		tacts = __rdtsc() - tacts;
-//		if (tacts < mintacts)
-//			mintacts = tacts;
-//	}
-//	printf("xmss_pkFromSig_ type = %I64d\n", mintacts);
-//#endif
-
 	// 5: for 𝑗 from 1 to 𝑑 − 1 do
 	size_t j;
 	for (j = 1; j < FIPS205_D; ++j)
@@ -223,13 +189,6 @@ SUCCESS FIPS205_AVX_ht_verify(
 		FIPS205_AVX_xmss_pkFromSig(node, idxleaf, SIGtmp, node, PK_seed, PK_seed_n, adr);
 
 #endif 
-		//#ifndef _DEBUG
-		//		tacts = __rdtsc() - tacts;
-		//		printf("xmss_pkFromSig_ j = %I64d time = %I64d\n", j, tacts);
-		//#endif
-				//memcpy(node[0], node[1], FIPS205_N);
-				//12: end for
-
 	}
 	/*
 13: if 𝑛𝑜𝑑𝑒 = PK.root then
