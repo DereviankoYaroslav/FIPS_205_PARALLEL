@@ -3,7 +3,7 @@
 #if defined(_MSC_VER)
 #include <intrin.h>
 #else
-#include <x86intrin.h>   // covers AVX, SSE, FMA, etc.
+#include <x86intrin.h>
 #endif
 #include <stdlib.h>
 #include <inttypes.h>

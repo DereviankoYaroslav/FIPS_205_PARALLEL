@@ -439,9 +439,6 @@ static INLINE uint32_t getType_OLD(PADR_OLD adr)
 
 static INLINE uint32_t getKeyPairAddress_OLD(PADR_OLD adr)
 {
-	//uint32_t* p = (uint32_t*)adr;
-	//return p[5];
-	//return ToBigEndian32(p[5]);
 #if 1
 	return toInt32(adr->wha.key_pair_Address_OLD, 4);
 #else
@@ -456,9 +453,6 @@ static INLINE uint32_t getKeyPairAddress_OLD(PADR_OLD adr)
 
 static INLINE uint32_t getTreeIndex_OLD(PADR_OLD adr)
 {
-	//uint32_t* p = (uint32_t*)adr;
-	//return p[7];
-	//return ToBigEndian32(p[7]);
 #if 1
 	return toInt32(adr->hta.tree_index_OLD, 4);
 #else
@@ -495,11 +489,6 @@ static INLINE void setLayerAddress_c_OLD(PADR_C_OLD adr, uint8_t value)
 
 static INLINE void setTreeAddress_c_OLD(PADR_C_OLD adr, uint64_t value)
 {
-	/*adr->tree_Address[0] = value[0];
-	adr->tree_Address[1] = value[1];
-	adr->tree_Address[2] = value[2];*/
-	//memcpy(adr->tree_Address, value, 8);
-	//adr->tree_Address = ToBigEndian64(value);
 	toByte64(adr->tree_Address_OLD, value, 8);
 }
 
@@ -518,59 +507,37 @@ static INLINE void setType_c_OLD(PADR_C_OLD adr, uint32_t Y)
 
 static INLINE void setKeyPairAddress_c_OLD(PADR_C_OLD adr, uint32_t i)
 {
-	//uint8_t* p = (uint8_t*)adr;
-	//memcpy(p + 10, (uint8_t*)&i, 4);
-	//p[5] = i;
 	toByte32(adr->wha.key_pair_Address_OLD, i, 4);
 }
 
 static INLINE void setChainAddress_c_OLD(PADR_C_OLD adr, uint32_t i)
 {
-	/*uint8_t* p = (uint8_t*)adr;
-	memcpy(p + 14, (uint8_t*)&i, 4);*/
-	//p[6] = i;
 	toByte32(adr->wha.chain_Address_OLD, i, 4);
 }
 
 static INLINE void setTreeHeight_c_OLD(PADR_C_OLD adr, uint32_t i)
 {
-	//uint8_t* p = (uint8_t*)adr;
-	//memcpy(p + 14, (uint8_t*)&i, 4);
-	//p[6] = i;
 	toByte32(adr->fta.tree_height_OLD, i, 4);
 }
 
 static INLINE void setHashAddress_c_OLD(PADR_C_OLD adr, uint32_t i)
 {
-	/*uint8_t* p = (uint8_t*)adr;
-	memcpy(p + 18, (uint8_t*)&i, 4);*/
-	//p[7] = i;
 	toByte32(adr->wga.hash_Address_OLD, i, 4);
 }
 
 static INLINE void setTreeIndex_c_OLD(PADR_C_OLD adr, uint32_t i)
 {
-	//uint8_t* p = (uint8_t*)adr;
-	//memcpy(p + 18, (uint8_t*)&i, 4);
-	//p[7] = i;
 	toByte32(adr->fta.tree_index_OLD, i, 4);
 }
 
 static INLINE uint32_t getKeyPairAddress_c_OLD(PADR_C_OLD adr)
 {
-	/*uint8_t* p = (uint8_t*)adr;
-	uint32_t value;
-	memcpy((uint8_t*)&value, p + 10, 4);*/
 	return toInt32(adr->wha.key_pair_Address_OLD, 4);
 	
 }
 
 static INLINE uint32_t getTreeIndex_c_OLD(PADR_C_OLD adr)
 {
-	/*uint8_t* p = (uint8_t*)adr;
-	uint32_t value;
-	memcpy((uint8_t*)&value, p + 18, 4);
-	return value;*/
 	return toInt32(adr->fta.tree_index_OLD, 4);
 
 }
@@ -588,12 +555,6 @@ static INLINE void toShort_OLD(PADR_C_OLD Adr_c, const PADR_OLD Adr)
 	value = getType_OLD(Adr);
 	setType_c_OLD(Adr_c, value);
 	memcpy((uint8_t*)Adr_c + 10, (uint8_t*)Adr + 20, 12);
-	/*memcpy(Adr_c->tree_Address, temp + 4, 8);
-	toByte32(&Adr_c->type, Adr->type, 1);
-	memcpy((uint8_t*)Adr_c + 10, (uint8_t*)Adr + 20, 12);*/
 }
-
-
-
 
 #endif

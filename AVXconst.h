@@ -4,7 +4,7 @@
 #if defined(_MSC_VER)
 #include <intrin.h>
 #else
-#include <x86intrin.h>   // covers AVX, SSE, FMA, etc.
+#include <x86intrin.h>
 #endif
 #include "FIPS_205_Params.h"
 
@@ -16,16 +16,6 @@ static uint32_t bswap(uint32_t value)
 		(value >> 24);
 	return res;
 }
-
-//__declspec (align (64))
-//extern const uint32_t ChainAddressClearMaska[8] ;
-//extern const uint32_t HashAddressClearMaska [8] ;
-//
-//extern const uint32_t ChainAddressOne[8];
-//
-//extern const uint32_t HashAddressOne[8];
-
-//#define ChainAddressSet(temp, value) {temp = } 
 
 extern __m256i maska_for_bytes;
 extern __m256i maska_for_shuffle_32;
@@ -98,21 +88,6 @@ inline __m256i AVX2_sll22(__m256i src)
 	return dest;
 }
 
-//inline __m256i AVX2_srl10(__m256i src)
-//{
-//	__m256i combined = _mm256_permute2x128_si256(src, src, /*0x08*/1); // high в low части, low в high
-//	//__m256i maska = _mm256_setr_epi32(0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x0000FFFF, 0, 0);
-//
-//	// —двиг вправо на 10 байтов
-//	__m256i r1 = _mm256_alignr_epi8(combined, src, 10);
-//	r1 = _mm256_and_si256(r1, maska);
-//
-//
-//
-//
-//
-//	return r1;
-//}
 #define SetTypeValue(dest, type) {	\
 		dest = __mm256_or_si256 (__mm256_set1_epi32 (type << 16), __mm256_andnot_si256(__mm256_sll_epi32(maska_for_bytes, 16), dest))
 
@@ -136,5 +111,4 @@ _mm256_andnot_si256(maska,					\
 #define AVXSetKeyPara(dest, value) AVXSetValue4(dest, KeyParaMaska, value)
 #define AVXSetTreeHeight(dest, value) AVXSetValue1(dest, TreeHeightMaska, value)
 #define AVXSetTreeIndex(dest, value) AVXSetValue4(dest, TreeIndexMaska, value)
-#endif // !AVXconst
-
+#endif 

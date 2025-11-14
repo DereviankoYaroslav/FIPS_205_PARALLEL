@@ -1,5 +1,4 @@
-﻿
-#include <stdlib.h>
+﻿#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include "FIPS_205_Params.h"
@@ -73,19 +72,6 @@ void print_params()
 	printf("pk_bytes = %d\n", FIPS205_PK_BYTES);
 	printf("sk_bytes = %d\n", FIPS205_SK_BYTES);
 	printf("sig_bytes = %d\n", FIPS205_SIG_BYTES);
-
-
-	/*
-	
-
-
-
-	*/
-	//#define	SIG_BYTES	7856
-
-
-
-
 }
 
 // Algorithm 2 toInt(𝑋, 𝑛)
