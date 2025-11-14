@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{2db58973-9629-4253-9168-01422f28252a}</ProjectGuid>
+    <RootNamespace>FIPS205PARALLEL</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CONSOLE;_CRT_SECURE_NO_WARNINGS;_PREDCALC;_JSON_FILE_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <OpenMPSupport>false</OpenMPSupport>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;_PREDCALC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <OpenMPSupport>true</OpenMPSupport>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="AVX256.h" />
+    <ClInclude Include="AVX512.h" />
+    <ClInclude Include="AVXconst.h" />
+    <ClInclude Include="Common.h" />
+    <ClInclude Include="FIPS_205_internal.h" />
+    <ClInclude Include="FIPS205_WOTS.h" />
+    <ClInclude Include="FIPS_205_Adr.h" />
+    <ClInclude Include="FIPS_205_Adr_old.h" />
+    <ClInclude Include="FIPS_205_Fors.h" />
+    <ClInclude Include="FIPS_205_Fors_old.h" />
+    <ClInclude Include="FIPS_205_Hashs.h" />
+    <ClInclude Include="FIPS_205_Hashs_old.h" />
+    <ClInclude Include="FIPS_205_internal_old.h" />
+    <ClInclude Include="FIPS_205_JSon.h" />
+    <ClInclude Include="FIPS_205_Params.h" />
+    <ClInclude Include="FIPS_205_Test.h" />
+    <ClInclude Include="FIPS_205_wots_old.h" />
+    <ClInclude Include="FIPS_205_xmss.h" />
+    <ClInclude Include="FIPS_205_xmss_old.h" />
+    <ClInclude Include="OLD\address.h" />
+    <ClInclude Include="OLD\api.h" />
+    <ClInclude Include="OLD\fors.h" />
+    <ClInclude Include="OLD\hashx8.h" />
+    <ClInclude Include="OLD\params.h" />
+    <ClInclude Include="OLD\sha256.h" />
+    <ClInclude Include="OLD\sha256x8.h" />
+    <ClInclude Include="OLD\sha256_offsets.h" />
+    <ClInclude Include="OLD\thash.h" />
+    <ClInclude Include="OLD\thashx8.h" />
+    <ClInclude Include="OLD\utils.h" />
+    <ClInclude Include="OLD\utilsx8.h" />
+    <ClInclude Include="OLD\wots.h" />
+    <ClInclude Include="print.h" />
+    <ClInclude Include="sha2.h" />
+    <ClInclude Include="SHA256_defines.h" />
+    <ClInclude Include="SHA256_device.h" />
+    <ClInclude Include="SHA512_defined.h" />
+    <ClInclude Include="SHA512.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AVX256.c" />
+    <ClCompile Include="AVX512.c" />
+    <ClCompile Include="AVXconst.c" />
+    <ClCompile Include="Common.c" />
+    <ClCompile Include="fips202.c" />
+    <ClCompile Include="FIPS205_internal.c" />
+    <ClCompile Include="FIPS_205_fors.c" />
+    <ClCompile Include="FIPS_205_fors_old.c" />
+    <ClCompile Include="FIPS_205_ht.c" />
+    <ClCompile Include="FIPS_205_ht_old.c" />
+    <ClCompile Include="FIPS_205_internal_old.c" />
+    <ClCompile Include="FIPS_205_json.c" />
+    <ClCompile Include="FIPS_205_xmss_old.c" />
+    <ClCompile Include="FIPS_205_Addr.c" />
+    <ClCompile Include="FIPS_205_Common_fun_old.c" />
+    <ClCompile Include="FIPS_205_hashs.c" />
+    <ClCompile Include="FIPS_205_hashs_old.c" />
+    <ClCompile Include="FIPS_205_WOTS.c" />
+    <ClCompile Include="FIPS_205_wots_old.c" />
+    <ClCompile Include="FIPS_205_xmss.c" />
+    <ClCompile Include="main.c" />
+    <ClCompile Include="OLD\address.c" />
+    <ClCompile Include="OLD\fors.c" />
+    <ClCompile Include="OLD\hash_sha256.c" />
+    <ClCompile Include="OLD\hash_sha256x8.c" />
+    <ClCompile Include="OLD\sha256.c" />
+    <ClCompile Include="OLD\sha256avx.c" />
+    <ClCompile Include="OLD\sha256x8.c" />
+    <ClCompile Include="OLD\sign.c" />
+    <ClCompile Include="OLD\thash_sha256_simple.c" />
+    <ClCompile Include="OLD\thash_sha256_simplex8.c" />
+    <ClCompile Include="OLD\utils.c" />
+    <ClCompile Include="OLD\utilsx8.c" />
+    <ClCompile Include="OLD\wots.c" />
+    <ClCompile Include="print.c" />
+    <ClCompile Include="SHA256_device.c" />
+    <ClCompile Include="sha256_old.c" />
+    <ClCompile Include="SHA512.c" />
+    <ClCompile Include="Test.c" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
