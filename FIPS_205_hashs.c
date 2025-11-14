@@ -125,43 +125,6 @@ void AVX_F(uint8_t* hash_value, const void* PK_seed_, uint8_t* Adr, const uint8_
 
 }
 
-
-//void AVX_F4(uint8_t hash_value[4][FIPS205_N], const void* PK_seed_, uint8_t Adr[4][22], const uint8_t Msg[4][FIPS205_N])
-//{
-//#ifdef SHAKE
-//	uint8_t* PK_seed = (uint8_t*)PK_seed_;
-//	uint8_t buf[N + 32 + N];
-//	len = N + 32 + N;
-//	memcpy(buf, PK_seed, N);
-//	memcpy(buf + N, Adr, 32);
-//	memcpy(buf + N + 32, Msg, N);
-//	shake256(hash_value, N, buf, len);
-//#else
-//	//uint8_t temp[32];
-//	const uint32_t* PK_seed = (const uint32_t*)PK_seed_;
-//	uint8_t in[4][22 + FIPS205_N];
-//	memcpy(in [0], Adr[0], 22);
-//	memcpy(in [1], Adr[1], 22);
-//	memcpy(in [2], Adr[2], 22);
-//	memcpy(in [3], Adr[3], 22);
-//
-//	memcpy(in[0] + 22, Msg[0], FIPS205_N);
-//	memcpy(in[1] + 22, Msg[1], FIPS205_N);
-//	memcpy(in[2] + 22, Msg[2], FIPS205_N);
-//	memcpy(in[3] + 22, Msg[3], FIPS205_N);
-//		//memcpy(in + 22, Msg, FIPS205_N);
-//	AVX_sha256_WITH_PREDCALC4(hash_value, PK_seed, in);
-//
-//	/*ADR_C Adr_c;
-//	toShort(&Adr_c, (PADR)Adr);*/
-//
-//	// Trunc𝑛(SHA-256(PK.seed ∥ toByte(0,64−𝑛) ∥ ADRS𝑐 ∥ 𝑀1)) 
-//
-//#endif
-//
-//}
-
-
 void AVX_F8(
 	uint8_t hash_value[8][FIPS205_N], const void* PK_seed_, uint8_t Adr[22], const uint8_t Msg[FIPS205_N], int i)
 {
@@ -200,128 +163,6 @@ void AVX_F8(
 #endif
 
 }
-
-
-//int test_AVX_F()
-//{
-//	uint8_t PK_seed[FIPS205_N], Msg8[8][FIPS205_N];
-//	uint8_t hash_value1[8][FIPS205_N], hash_value2[8][FIPS205_N];
-//	uint8_t Adr8[8][22];
-//	srand(0);
-//	for (int i = 0; i < FIPS205_N; ++i)
-//	{
-//		PK_seed[i] = rand() % 256;
-//	}
-//
-//	for (int j = 0; j < 8; ++j)
-//	{
-//		for (int i = 0; i < FIPS205_N; ++i)
-//			Msg8[j][i] = rand() % 256;
-//		for (int i = 0; i < 22; ++i)
-//			Adr8[j][i] = rand() % 256;
-//	}
-//	uint32_t PK_seed_[32];
-//
-//	
-//	AVX_sha256_PREDCALC_VALUE(PK_seed_, PK_seed, FIPS205_N);
-//
-//#ifndef _DEBUG
-//	min_tacts = 0xFFFFFFFFFFFFFFFF;
-//	for (int i = 0; i < 256; ++i)
-//	{
-//		tacts = __rdtsc();
-//#endif
-//		for (int j = 0; j < 8; ++j)
-//		{
-//			AVX_F(hash_value1[j], PK_seed_, Adr8[j], Msg8[j]);
-//		}
-//#ifndef _DEBUG
-//		tacts = __rdtsc() - tacts;
-//		if (min_tacts > tacts)
-//			min_tacts = tacts;
-//	}
-//	printf("AVX_F time = %I64d\n", min_tacts);
-//
-//#endif
-//
-//#ifndef _DEBUG
-//	min_tacts = 0xFFFFFFFFFFFFFFFF;
-//	for (int i = 0; i < 256; ++i)
-//	{
-//		tacts = __rdtsc();
-//#endif
-//
-//		AVX_F4(hash_value2, PK_seed_, Adr8, Msg8);
-//		AVX_F4(hash_value2 + 4, PK_seed_, Adr8 + 4, Msg8 + 4);
-//#ifndef _DEBUG
-//		tacts = __rdtsc() - tacts;
-//		if (min_tacts > tacts)
-//			min_tacts = tacts;
-//	}
-//	printf("AVX_F4 time = %I64d\n", min_tacts);
-//
-//#endif
-//	int res = memcmp(hash_value1, hash_value2, 8 * FIPS205_N);
-//	printf("AVX_F and AVX_F4 %s\n", res == 0? "OK" : "ERROR");
-//
-//#ifndef _DEBUG
-//	min_tacts = 0xFFFFFFFFFFFFFFFF;
-//	for (int i = 0; i < 256; ++i)
-//	{
-//		tacts = __rdtsc();
-//#endif
-//
-//		AVX_F8(hash_value2, PK_seed_, Adr8, Msg8);
-//		
-//#ifndef _DEBUG
-//		tacts = __rdtsc() - tacts;
-//		if (min_tacts > tacts)
-//			min_tacts = tacts;
-//	}
-//	printf("AVX_F8 time = %I64d\n", min_tacts);
-//
-//#endif
-//	res = memcmp(hash_value1, hash_value2, 8 * FIPS205_N);
-//	printf("AVX_F and AVX_F8 %s\n", res == 0 ? "OK" : "ERROR");
-//	
-//#ifndef _DEBUG
-//	min_tacts = 0xFFFFFFFFFFFFFFFF;
-//	for (int i = 0; i < 256; ++i)
-//	{
-//		tacts = __rdtsc();
-//#endif
-//	thashx8(
-//		hash_value2[0],
-//		hash_value2[1],
-//		hash_value2[2],
-//		hash_value2[3],
-//		hash_value2[4],
-//		hash_value2[5],
-//		hash_value2[6],
-//		hash_value2[7],
-//
-//		Msg8[0],
-//		Msg8[1],
-//		Msg8[2],
-//		Msg8[3],
-//		Msg8[4],
-//		Msg8[5],
-//		Msg8[6],
-//		Msg8[7],
-//		2,
-//		PK_seed,
-//		Adr8);
-//#ifndef _DEBUG
-//	tacts = __rdtsc() - tacts;
-//	if (min_tacts > tacts)
-//		min_tacts = tacts;
-//	}
-//	printf("thashx8 time = %I64d\n", min_tacts);
-//
-//#endif
-//
-//	return res;
-//}
 
 // PRF and F - equals!!!!
 
@@ -391,7 +232,6 @@ HashValue – значення гешу, рядок байтів завдовж�
 
 
 }
-
 
 void AVX_HASH(uint8_t* hash_value, const void* PK_seed_, uint8_t* Adr, const uint8_t Msg[][FIPS205_N])
 {
@@ -468,51 +308,6 @@ void PRFmsg(uint8_t* dest, const uint8_t* SK_prf, const uint8_t* optrand, const 
 		shake256(dest, N, buf, len);
 		free(buf);
 #elif 1
-//#ifdef FIPS205_N == 16
-//	#define	BLOCK_BYTES	64
-//	#define SHA_OUTPUT_BYTES	32
-//#else 
-//#define	BLOCK_BYTES	128
-//#define SHA_OUTPUT_BYTES	64
-//#endif
-//	uint8_t buf[BLOCK_BYTES + SHA_OUTPUT_BYTES];
-//
-//for (int i = 0; i < FIPS205_N; i++) {
-//	buf[i] = 0x36 ^ SK_prf[i];
-//
-//}
-//
-//memset(buf + FIPS205_N, 0x36, BLOCK_BYTES - FIPS205_N);
-//uint8_t state[40];
-//sha256_inc_init(state);
-//sha256_inc_blocks(state, buf, 1);
-//memcpy(buf, optrand, FIPS205_N);
-//
-//if (FIPS205_N + mlen < BLOCK_BYTES) {
-//	memcpy(buf + FIPS205_N, m, mlen);
-//	sha256_inc_finalize(buf + BLOCK_BYTES, state,
-//		buf, mlen + FIPS205_N);
-//}
-//
-//else {
-//	memcpy(buf + FIPS205_N, m, BLOCK_BYTES - FIPS205_N);
-//	sha256_inc_blocks(state, buf, 1);
-//
-//	m += BLOCK_BYTES - FIPS205_N;
-//	mlen -= BLOCK_BYTES - FIPS205_N;
-//	sha256_inc_finalize(buf + BLOCK_BYTES, state, m, mlen);
-//}
-//
-//for (int i = 0; i < FIPS205_N; i++) {
-//	buf[i] = 0x5c ^ SK_prf[i];
-//}
-//
-//memset(buf + FIPS205_N, 0x5c, BLOCK_BYTES - FIPS205_N);
-//sha256(buf, buf, BLOCK_BYTES + SHA_OUTPUT_BYTES);
-//memcpy(dest, buf, FIPS205_N);
-//#endif
-	//uint8_t out[64];
-
 	gen_message_random(dest, SK_prf, optrand, m, mlen);
 #else
 /*
@@ -523,11 +318,6 @@ MGF1-SHA-512(𝑅 ∥ PK.seed ∥ SHA-512(𝑅 ∥ PK.seed ∥ PK.root ∥ 𝑀)
 #endif
 }
 
-
-
-
-
-//SUCCESS AVX_PRFmsg(uint8_t* dest, const uint8_t* SK_prf, const uint8_t* opt_rand, const uint8_t* Msg, uint32_t Msg_len)
 void AVX_PRFmsg(uint8_t* dest, const uint8_t* SK_prf, const uint8_t* opt_rand, const uint8_t* Msg, uint32_t Msg_len, uint8_t *buf)
 {
 	SUCCESS success = ERROR;
@@ -738,89 +528,6 @@ hash_value – значення гешу, рядок байтів завдовж
 
 }
 
-//void AVX_Tl(uint8_t* hash_value, const void* PK_seed, uint8_t* Adr, const uint8_t Msg[][FIPS205_N], uint32_t len)
-//{
-//	/*
-//Вхід.
-//PK.seed – компонент відкритого ключа, рядок байтів завдовжки n байтів;
-//ADR – дані про дерева, структура завдовжки 32 байта
-//M – len повідомлень, кожне завдовжки n.
-//Вихід.
-//hash_value – значення гешу, рядок байтів завдовжки n байтів.
-//
-//
-//	*/
-//	
-//	
-//#ifdef SHAKE
-//	uint8_t buf[FIPS205_N + ADR_SIZE + ARRAY_SIZE];
-//#else
-//	uint8_t buf[ADR_SIZE + ARRAY_SIZE];
-//#endif
-//
-//#ifdef SHAKE
-//	cur_len = FIPS205_N + ADR_SIZE + len * FIPS205_N;
-//	//buf = malloc(cur_len);
-//	//if (buf)
-//	//{
-//	//	success = OK;
-//		memcpy(buf, PK_seed, FIPS205_N);
-//		memcpy(buf + FIPS205_N, Adr, ADR_SIZE);
-//		uint8_t* p = buf + FIPS205_N + ADR_SIZE;
-//		size_t j;
-//		for (j = 0; j < len; ++j)
-//		{
-//			memcpy(p, Msg[j], ADR_SIZE);
-//			p += ADR_SIZE;
-//		}
-//
-//		shake256(hash_value, ADR_SIZE, buf, cur_len);
-//		//free(buf);
-//	//}
-//#else
-//
-//#if FIPS205_N == 16
-//	uint32_t* PK_seed_ = (uint32_t*)PK_seed;
-//	const uint32_t size = 64;
-//#else
-//	uint64_t* PK_seed_ = (uint64_t*)PK_seed;
-//	const uint32_t size = 128;
-//#endif
-//	uint32_t cur_len = /*size + */ADR_SIZE + len * FIPS205_N;
-//
-//	//buf = malloc(cur_len);
-//
-//	//if (buf)
-//	//{
-//		//success = OK;
-//		//memcpy(buf, PK_seed, FIPS205_N);
-//		//memset(buf + FIPS205_N, 0, size - FIPS205_N);
-//		memcpy(buf /*+ size*/, Adr, ADR_SIZE);
-//		uint8_t* p = buf + /*size + */ ADR_SIZE;
-//
-//		size_t j;
-//		for (j = 0; j < len; ++j)
-//		{
-//			memcpy(p, Msg[j], FIPS205_N);
-//			p += FIPS205_N;
-//		}
-//		
-//		
-//#if FIPS205_N == 16 
-//		
-//		AVX_PREDCALC_sha256(hash_value, PK_seed_, buf, cur_len, FIPS205_N);
-//#else
-//		AVX_PREDCALC_sha512(hash_value, PK_seed_, buf, cur_len, FIPS205_N);
-//
-//#endif
-//		//free(buf);
-//	//}
-//#endif
-//
-//	//return success;
-//}
-
-
 #if 0
 // PRFmsg
 // Генерація псевдовипадкових даних.
@@ -954,14 +661,6 @@ TlTime2 = 0xFFFFFFFFFFFFFFFF, TlTime2_K = 0xFFFFFFFFFFFFFFFF;
 #endif
 
 
-
-
-
-
-
-
-
-
 // Функцію застосовують для генерації гешу при генерації ЦП
 // Вхід
 //𝑅 – Заданий рядок байтів завдовжки n байтів;
@@ -1030,10 +729,6 @@ SUCCESS HMsg(uint8_t* dest, const uint8_t* R, const uint8_t* PK_seed, const uint
 		free(buf);
 	return success;
 }
-
-
-
-
 
 /*
 Функцію застосовують для генерації секретних значень для секретних ключів для дерев WOTS+ та FORS.
@@ -1585,18 +1280,7 @@ SUCCESS test_hashs()
 		HASH_with_predcalc(dest1, PK_seed, adr, Msg);
 #else
 		HASH_with_predcalc(dest1, PK_seed_n, adr_short, Msg);
-//#if N == 16
-//		
-//		HASH_with_predcalc(dest1, predcalc_pk_256, adr_short, Msg);
-//#endif
-//#if N == 24
-//		HASH_with_predcalc(dest1, predcalc_pk_384, adr_short, Msg);
-//		
-//#endif
-//#if N == 32
-//		HASH_with_predcalc(dest1, predcalc_pk_512, adr_short, Msg);
-//#endif
-//#endif
+
 #ifndef _DEBUG
 		tacts = __rdtsc() - tacts;
 		if (tacts < HTime2)
@@ -1610,20 +1294,9 @@ SUCCESS test_hashs()
 			if (dest[j] != dest1[j])
 				success = ERROR;
 		}
-//#ifdef _DEBUG
-//			printf("H - %s\n", success == OK ? "OK" : "ERROR");
-//#endif
+
 
 #endif
-
-		//printf("HASH\n");
-		//fwrite(dest, N, 1, f);
-		
-//#ifdef _PREDCALC
-//		fwrite(dest1, N, 1, f);
-//#endif
-		
-//#if 0
 
 		//SUCCESS Tl(uint8_t * hash_value, const uint8_t * PK_seed, uint32_t * Adr, const uint8_t * Msg, size_t Msg_len);		
 #ifndef _DEBUG
@@ -1655,16 +1328,7 @@ SUCCESS test_hashs()
 #ifndef _DEBUG
 		tacts = __rdtsc();
 #endif
-//#if N == 16
 		Tl_with_predcalc(dest1, PK_seed, PK_seed_n, adr_short, Msg, LEN);
-//#endif
-//#if N == 24
-//		Tl_with_predcalc(dest1, predcalc_pk_256, predcalc_pk_384, adr_short, Msg, LEN);
-//#endif
-//
-//#if N == 32
-//		Tl_with_predcalc(dest1, predcalc_pk_256, predcalc_pk_512, adr_short, Msg, LEN);
-//#endif
 
 #ifndef _DEBUG
 		tacts = __rdtsc() - tacts;
@@ -1683,18 +1347,9 @@ SUCCESS test_hashs()
 				success = ERROR;
 		}
 
-//#ifdef _DEBUG
-//			printf("Tl (LEN = %d) - %s\n", LEN, success == OK ? "OK" : "ERROR");
-//#endif
 
 #endif
-		
-		/*fwrite(dest, N, 1, f);
 
-#ifdef _PREDCALC
-		fwrite(dest1, N, 1, f);
-#endif*/
-		//printf("Tl (LEN = %d\t)\n", LEN);
 #ifndef _DEBUG
 		tacts = __rdtsc();
 #endif
@@ -1724,16 +1379,7 @@ SUCCESS test_hashs()
 #ifndef _DEBUG
 		tacts = __rdtsc();
 #endif
-//#if N == 16
 		Tl_with_predcalc(dest1, PK_seed, PK_seed_n, adr_short, Msg, K);
-//#endif
-//#if N == 24
-//		Tl_with_predcalc(dest1, predcalc_pk_256, predcalc_pk_384, adr_short, Msg, K);
-//#endif
-//
-//#if N == 32
-//		Tl_with_predcalc(dest1, predcalc_pk_256, predcalc_pk_512, adr_short, Msg, K);
-//#endif
 
 #ifndef _DEBUG
 		tacts = __rdtsc() - tacts;
@@ -1750,22 +1396,7 @@ SUCCESS test_hashs()
 			if (dest[j] != dest1[j])
 				success = ERROR;
 		}
-//#endif
-//#ifdef _DEBUG
-//			printf("Tl (K = %d) - %s\n", K, success == OK ? "OK" : "ERROR");
-//#endif
-	/*	fwrite(dest, N, 1, f);
 
-#ifdef _PREDCALC
-		fwrite(dest1, N, 1, f);
-#endif*/
-
-		
-		//void HASH(uint8_t * hash_value, const uint8_t * PK_seed, uint32_t * Adr, const uint8_t * Msg);
-
-		//void F(uint8_t * hash_value, const uint8_t * PK_seed, uint32_t * Adr, const uint8_t * Msg);
-
-//#if defined (SHAKE)
 
 #ifndef _DEBUG
 		tacts = __rdtsc() ;
@@ -1801,14 +1432,6 @@ SUCCESS test_hashs()
 			if (dest[j] != dest1[j])
 				success = ERROR;
 		}
-//#ifdef _DEBUG
-//			printf("F  - %s\n", success == OK ? "OK" : "ERROR");
-//#endif
-
-		
-		//F(dest, PK_seed, adr_short, Msg1);
-
-
 
 #endif
 		/*fprintf(f, "F\n");
@@ -1816,7 +1439,6 @@ SUCCESS test_hashs()
 //#endif
 
 	}
-	//fclose(f);
 #ifndef _DEBUG
 	printf("PRFTime = %I64d %I64d\n", PRFTime1, PRFTime2);
 	printf("TlTime (LEN = %d\t) = %I64d %I64d\n", LEN, TlTime1, TlTime2);
@@ -2098,12 +1720,7 @@ void AVX_Tl_(uint8_t* out, const void* predcalc_pk, uint8_t adr[], uint8_t *keys
 	uint32_t key_size = keys_count * FIPS205_N;
 	memcpy(cur_addr, adr, ADR_SIZE);
 	memcpy(cur_addr + ADR_SIZE, keys, key_size);
-	/*for (i = 0; i < keys_count; ++i)
-	{
-		keys8 = (uint8_t*)(keys + i);
-		memcpy(cur_addr, keys8, FIPS205_N);
-		cur_addr += FIPS205_N;
-	}*/
+
 	cur_addr += ADR_SIZE + key_size;
 	(*cur_addr++) = 0x80;
 	uint32_t bytes = ADR_SIZE + BLOCK_SIZE + key_size;
@@ -2165,110 +1782,6 @@ void AVX_Tl_(uint8_t* out, const void* predcalc_pk, uint8_t adr[], uint8_t *keys
 #undef	MIN_ZERO_NUMBER
 #undef  BLOCK_SIZE  
 }
-
-
-//void AVX_Tl_LEN(uint8_t* out, const void* predcalc_pk, uint8_t adr[], uint8_t* keys)
-//{
-//
-//#if FIPS205_N == 16
-//#define MIN_ZEROS_COUNT 8
-//#define  BLOCK_SIZE  64
-//
-//	uint32_t* pk = (uint32_t*)predcalc_pk;
-//	__declspec (align (64))
-//		uint32_t state[8];
-//
-//#else
-//#define MIN_ZEROS_COUNT  16 
-//#define  BLOCK_SIZE  128
-//	uint64_t* pk = (uint64_t*)predcalc_pk;
-//	__declspec (align (64))
-//		uint64_t state[8];
-//
-//
-//#endif
-//	memcpy(state, predcalc_pk, sizeof(state));
-//	//__m256i* state256 = (__m256i*)pk;
-//#define BYTES_COUNT_MAX  ((FIPS205_LEN > FIPS205_K? FIPS205_LEN :  FIPS205_K) * FIPS205_N + ADR_SIZE)
-//#define BLOCKS_COUNT_MAX (((BYTES_COUNT_MAX + BLOCK_SIZE - 1)/BLOCK_SIZE) + 1)
-//
-//	__m256i blocks[BLOCKS_COUNT_MAX][BLOCK_SIZE / sizeof(__m256i)];
-//	//__m256i* blocks = (__m256i*)keys;
-//	uint32_t* blocks32 = (uint32_t*)blocks;
-//	//uint8_t* blocks8 = (uint8_t*)blocks;
-//	uint8_t* cur_addr = (uint8_t*)blocks;
-//	uint32_t i;
-//	uint32_t key_size = keys_count * FIPS205_N;
-//	memcpy(cur_addr, adr, ADR_SIZE);
-//	memcpy(cur_addr + ADR_SIZE, keys, key_size);
-//	/*for (i = 0; i < keys_count; ++i)
-//	{
-//		keys8 = (uint8_t*)(keys + i);
-//		memcpy(cur_addr, keys8, FIPS205_N);
-//		cur_addr += FIPS205_N;
-//	}*/
-//	cur_addr += ADR_SIZE + key_size;
-//	(*cur_addr++) = 0x80;
-//	uint32_t bytes = ADR_SIZE + BLOCK_SIZE + key_size;
-//	uint32_t cur_bytes = ADR_SIZE + key_size + 1;
-//	uint32_t max_bytes = (cur_bytes + BLOCK_SIZE - 1) / BLOCK_SIZE * BLOCK_SIZE;
-//	uint32_t zeros_count = max_bytes - cur_bytes;
-//	if (zeros_count < MIN_ZEROS_COUNT)
-//	{
-//		zeros_count += BLOCK_SIZE;
-//		max_bytes += BLOCK_SIZE;
-//	}
-//	uint8_t* end_addr = cur_addr + zeros_count;
-//
-//	memset(cur_addr, 0, zeros_count - 4);
-//	*(end_addr - 4) = (uint8_t)(bytes >> 21);
-//	*(end_addr - 3) = (uint8_t)(bytes >> 13);
-//	*(end_addr - 2) = (uint8_t)(bytes >> 5);
-//	*(end_addr - 1) = (uint8_t)(bytes << 3);
-//
-//	uint32_t blocks_count = max_bytes / BLOCK_SIZE;
-//	//memcpy(state, pk, sizeof(state));
-//
-//#if FIPS205_N == 16
-//
-//	__m256i w[16];
-//#else 
-//
-//	__m256i w[20];
-//#endif
-//
-//
-//	for (i = 0; i < blocks_count; ++i)
-//	{
-//#if FIPS205_N == 16
-//		w[0] = _mm256_shuffle_epi8(blocks[i][0], maska_for_shuffle_32);
-//		w[1] = _mm256_shuffle_epi8(blocks[i][1], maska_for_shuffle_32);
-//		AVX_sha256_compress(state, w);
-//#else
-//		w[0] = _mm256_shuffle_epi8(blocks[i][0], maska_for_shuffle_64);
-//		w[1] = _mm256_shuffle_epi8(blocks[i][1], maska_for_shuffle_64);
-//		w[2] = _mm256_shuffle_epi8(blocks[i][2], maska_for_shuffle_64);
-//		w[3] = _mm256_shuffle_epi8(blocks[i][3], maska_for_shuffle_64);
-//		AVX_sha512_compress(state, w);
-//#endif
-//
-//	}
-//	__m256i* state256 = (__m256i*)state;
-//#if FIPS205_N == 16
-//	state256[0] = _mm256_shuffle_epi8(state256[0], maska_for_shuffle_32);
-//#else
-//	state256[0] = _mm256_shuffle_epi8(state256[0], maska_for_shuffle_64);
-//#endif
-//
-//	memcpy(out, state, FIPS205_N);
-//
-//
-//#undef	BYTES_COUNT_MAX
-//#undef	BLOCKS_COUNT_MAX
-//#undef	MIN_ZERO_NUMBER
-//#undef  BLOCK_SIZE  
-//}
-
 
 void H_with_predcalc(
 	uint8_t* hash_value,
