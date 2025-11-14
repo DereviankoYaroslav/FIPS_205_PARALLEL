@@ -156,27 +156,6 @@ void FIPS205_sign_internal(uint8_t* sign, const uint8_t* M, uint32_t M_len, cons
 		//printf("adr");
 		//print(ADR_SIZE * 8, adr);
 		
-	/*
-	#if FIPS205_N == 16
-        p2 = FIPS205_AVX_fors_sign_(
-		fors_sign2, 
-		md, 
-		//in64,
-            SK_seed,
-            //&state256, 
-            state256_,  // block 256
-            state256_,  // block 256 or 512
-            cur_adr);
-#else
-        p2 = FIPS205_AVX_fors_sign_(fors_sign2, md, //in64,
-            SK_seed,
-            //&state256,
-            state256_,
-            state512_,
-            cur_adr);
-
-#endif
-	*/
 #ifdef SHAKE
 			p2 = FIPS205_AVX_fors_sign(fors_sign2, md, SK_seed, PK_seed, cur_adr);
 #else
@@ -204,29 +183,6 @@ void FIPS205_sign_internal(uint8_t* sign, const uint8_t* M, uint32_t M_len, cons
 				adr
 			);
 #endif
-
-			//printf("fors sign");
-			//print(FIPS205_K* (1 + FIPS205_A)* FIPS205_N*8, fors_sign);
-// 
-//#if FIPS205_N == 16 
-//			psign = FIPS205_AVX_fors_sign(
-//				psign,
-//				md,
-//				SK_seed,
-//				AVX_predcalc_pk_256_,      // BLOCK for 256 
-//				AVX_predcalc_pk_256_,
-//				adr
-//			);     // for 256 or 512 predcalc
-//#else
-//			psign = FIPS205_AVX_fors_sign(
-//				psign,
-//				md,
-//				SK_seed,
-//				AVX_predcalc_pk_256_,      
-//				AVX_predcalc_pk_512_,
-//				adr
-//			);
-//#endif
 
 #endif
 			// 16: PK𝐹 𝑂𝑅𝑆 ← fors_pkFromSig(SIG𝐹 𝑂𝑅𝑆, 𝑚𝑑,PK.seed,ADRS)
@@ -360,31 +316,6 @@ void FIPS205_sign_internal_new__(uint8_t* sign, const uint8_t* M, uint32_t M_len
 		setType1(adr, FORS_TREE);
 		setKeyPairAddress(adr, idx_leaf);
 
-		//printf("adr new__");
-		//print(ADR_SIZE*8, adr);
-
-
-		/*
-		#if FIPS205_N == 16
-			p2 = FIPS205_AVX_fors_sign_(
-			fors_sign2,
-			md,
-			//in64,
-				SK_seed,
-				//&state256,
-				state256_,  // block 256
-				state256_,  // block 256 or 512
-				cur_adr);
-	#else
-			p2 = FIPS205_AVX_fors_sign_(fors_sign2, md, //in64,
-				SK_seed,
-				//&state256,
-				state256_,
-				state512_,
-				cur_adr);
-
-	#endif
-		*/
 #ifdef SHAKE
 		p2 = FIPS205_AVX_fors_sign(fors_sign2, md, SK_seed, PK_seed, cur_adr);
 #else
@@ -413,29 +344,6 @@ void FIPS205_sign_internal_new__(uint8_t* sign, const uint8_t* M, uint32_t M_len
 			adr
 		);
 #endif
-
-		//printf("fors sign new__");
-		//print(FIPS205_K* (1 + FIPS205_A)* FIPS205_N * 8, fors_sign);
-		// 
-		//#if FIPS205_N == 16 
-		//			psign = FIPS205_AVX_fors_sign(
-		//				psign,
-		//				md,
-		//				SK_seed,
-		//				AVX_predcalc_pk_256_,      // BLOCK for 256 
-		//				AVX_predcalc_pk_256_,
-		//				adr
-		//			);     // for 256 or 512 predcalc
-		//#else
-		//			psign = FIPS205_AVX_fors_sign(
-		//				psign,
-		//				md,
-		//				SK_seed,
-		//				AVX_predcalc_pk_256_,      
-		//				AVX_predcalc_pk_512_,
-		//				adr
-		//			);
-		//#endif
 
 #endif
 			// 16: PK𝐹 𝑂𝑅𝑆 ← fors_pkFromSig(SIG𝐹 𝑂𝑅𝑆, 𝑚𝑑,PK.seed,ADRS)
@@ -554,33 +462,7 @@ SUCCESS FIPS205_verify_internal(const uint8_t* M, uint32_t M_len, const uint8_t*
 		setType1(adr, FORS_TREE);
 		setKeyPairAddress(adr, idx_leaf);
 		uint8_t pkFromSig[FIPS205_N];
-		/*
-		fors_pkFromSig___OLD(uint8_t* PK_fors, const uint8_t* SIGfors, const uint8_t* md, const
 
-	void* PK_seed_,
-#ifndef SHAKE
-	void* PK_seed_n,
-#endif
-	uint8_t* adr)
-		*/
-
-//#if FIPS205_N == 16
-//		fors_pkFromSig___OLD(
-//			pkFromSig,
-//			SIG_FORS,
-//			md,
-//			&AVX_predcalc_pk_256,		
-//			&AVX_predcalc_pk_256,		
-//			adr);
-//#else
-//		fors_pkFromSig___OLD(
-//			pkFromSig,
-//			SIG_FORS,
-//			md,
-//			&AVX_predcalc_pk_256,		
-//			&AVX_predcalc_pk_512,
-//			adr);
-//#endif
 
 #if FIPS205_N == 16
 		FIPS205_AVX_fors_pkFromSig(
@@ -683,33 +565,6 @@ SUCCESS FIPS205_verify_internal_new__(const uint8_t* M, uint32_t M_len, const ui
 		setType1(adr, FORS_TREE);
 		setKeyPairAddress(adr, idx_leaf);
 		uint8_t pkFromSig[FIPS205_N];
-		/*
-		fors_pkFromSig___OLD(uint8_t* PK_fors, const uint8_t* SIGfors, const uint8_t* md, const
-
-	void* PK_seed_,
-#ifndef SHAKE
-	void* PK_seed_n,
-#endif
-	uint8_t* adr)
-		*/
-
-		//#if FIPS205_N == 16
-		//		fors_pkFromSig___OLD(
-		//			pkFromSig,
-		//			SIG_FORS,
-		//			md,
-		//			&AVX_predcalc_pk_256,		
-		//			&AVX_predcalc_pk_256,		
-		//			adr);
-		//#else
-		//		fors_pkFromSig___OLD(
-		//			pkFromSig,
-		//			SIG_FORS,
-		//			md,
-		//			&AVX_predcalc_pk_256,		
-		//			&AVX_predcalc_pk_512,
-		//			adr);
-		//#endif
 
 #if FIPS205_N == 16
 		FIPS205_AVX_fors_pkFromSig_new__(
