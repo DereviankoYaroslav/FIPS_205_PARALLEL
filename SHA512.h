@@ -14,10 +14,5 @@ void sha512_with_predcalc2_(uint8_t* out, uint64_t* state, const uint8_t* in, ui
 // Для даних довільної довжини
 size_t sha512_with_predcalc_(uint8_t* out, uint64_t* predcalc_pk, uint8_t* in, size_t inlen);
 
-//int test_sha512_with_predcalc();
-//int test_sha512();
-//int test_AVX_SHA512();
-//void HMAC512(uint8_t* out, const uint8_t* sk, uint32_t sk_len, const uint8_t* in, uint32_t inlen, uint32_t out_len);
-//int test_HMAC512();
 
 #endif

@@ -9,23 +9,6 @@
 #include "thash.h"
 #include "utils.h"
 
-// 
-//#include "params.h"
-
-//#include "fors.h"
-//#include "hash.h"
-
-
-//#include "rng.h"
-//#include "utils.h"
-
-//#define	WOTS_HASH	0
-//#define	WOTS_PK		1
-//#define	TREE		2	
-//#define	FORS_TREE	3
-//#define FORS_ROOTS	4
-//#define WOTS_PRF	5
-//#define FORS_PRF	6
 
 /**
  * Computes the leaf at a given address. First generates the WOTS key pair,
