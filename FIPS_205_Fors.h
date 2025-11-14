@@ -20,7 +20,6 @@ void AVX_fors_init_in_block0(__m256i* in256, const uint8_t* adr);
 void AVX_fors_replace_blocks_keys4__(__m256i blockdest_[], __m256i blockkey256_1[], __m256i blockkey256_2[]);
 void convert_32_64(__m256i dest[2][4], const __m256i src[8]);
 void FIPS205_AVX_fors_sk(uint8_t sk[][FIPS205_N], const uint8_t* SK_seed, const void* PK_seed, const uint8_t* adr);
-//void FIPS205_AVX_fors_node(uint8_t node[FIPS205_N], const void* PK_seed, const void* PK_seed_n, __m256i in64[2], uint8_t* adr, uint32_t i, uint32_t z);
 void FIPS205_AVX_fors_node(uint8_t node[FIPS205_N], const void* PK_seed, const void* PK_seed_n, __m256i in64[2], uint32_t i, uint32_t z);
 // sk for fors tree
 void FIPS205_AVX_fors_sks(uint8_t *sk,
@@ -80,15 +79,6 @@ uint8_t* FIPS205_AVX_fors_sign_new(
 	const void* PK_256, 
 	const void* PK_256_512, 
 	uint8_t* adr);
-//uint8_t *FIPS205_AVX_fors_sign_and_pk(
-//	uint8_t *fors_sign2,
-//	uint8_t *PK_fors2,
-//	const uint8_t *md,
-//	const uint8_t* SK_seed,
-//	const void* PK_single256_512,
-//	const void* PKBlock256,
-//	const void* PKBlock256_512,
-//	const uint8_t *adr);
 
 uint8_t* FIPS205_AVX_fors_sign_new__(
 	uint8_t* sign, 
