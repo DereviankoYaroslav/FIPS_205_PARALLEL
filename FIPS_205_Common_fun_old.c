@@ -49,39 +49,6 @@ SUCCESS test_gen_len2()
 
 }
 
-//// Algorithm 2 toInt(𝑋, 𝑛)
-//// Converts a byte string to an integer.
-//uint64_t toInt64(const uint8_t* X, size_t n)
-//{
-//	//1: 𝑡𝑜𝑡𝑎𝑙 ← 0
-//	uint64_t total = 0;
-//	// 2: for 𝑖 from 0 to 𝑛 − 1 do
-//	size_t i;
-//	for (i = 0; i < n; ++i)
-//	{
-//		//3: 𝑡𝑜𝑡𝑎𝑙 ← 256 ⋅ 𝑡𝑜𝑡𝑎𝑙 + 𝑋[𝑖]
-//		total = total * 256 + X[i];
-//		// 4: end for
-//	}
-//	return total;
-//
-//}
-//
-//uint32_t toInt32(const uint8_t* X, size_t n)
-//{
-//	//1: 𝑡𝑜𝑡𝑎𝑙 ← 0
-//	uint32_t total = 0;
-//	// 2: for 𝑖 from 0 to 𝑛 − 1 do
-//	size_t i;
-//	for (i = 0; i < n; ++i)
-//	{
-//		//3: 𝑡𝑜𝑡𝑎𝑙 ← 256 ⋅ 𝑡𝑜𝑡𝑎𝑙 + 𝑋[𝑖]
-//		total = total * 256 + X[i];
-//		// 4: end for
-//	}
-//	return total;
-//
-//}
 //Algorithm 3 toByte(𝑥, 𝑛)
 //Converts an integer to a byte string.
 //Input: Integer 𝑥, string length 𝑛.Output : Byte string of length 𝑛 containing binary representation of 𝑥 in big - endian byte - order.
@@ -247,31 +214,3 @@ uint32_t base_2b_(uint32_t* base_b, const uint8_t* X, uint32_t out_len)
 	//	13 : return 𝑏𝑎𝑠𝑒𝑏
 	return csum;
 }
-
-
-//#if 1
-//uint64_t DigestParse(uint32_t* idxleaf, const uint8_t* digest)
-//#else
-//uint64_t DigestParse(uint8_t *md, uint32_t * idxleaf, const uint8_t *digest)
-//#endif
-//{
-//	//uint8_t md[(K * A + 7) / 8];
-//	uint8_t tmp_idxtree[(FIPS205_H - FIPS205_H / FIPS205_D + 7) / 8];
-//	uint8_t tmp_idxleaf[(FIPS205_H + 8 * FIPS205_D - 1) / (8 * FIPS205_D)];
-//	uint64_t idxtree;
-//		
-//	//memcpy(md, digest, (K * A + 7) / 8);
-//	// 7 tmp_idx_tree
-//	memcpy(tmp_idxtree, digest + (FIPS205_K * FIPS205_A + 7) / 8, sizeof(tmp_idxtree));
-//	
-//	memcpy(tmp_idxleaf, digest + (FIPS205_K * FIPS205_A + 7) / 8 + sizeof(tmp_idxtree), sizeof(tmp_idxleaf));
-//	
-//	idxtree = toInt64(tmp_idxtree, (FIPS205_H - FIPS205_H / FIPS205_D + 7) / 8) & (((uint64_t)1 << (FIPS205_H - FIPS205_H / FIPS205_D)) - 1);
-//	
-//	*idxleaf = toInt32(tmp_idxleaf, ((FIPS205_H + 8 * FIPS205_D - 1) / (8 * FIPS205_D))) % ((uint64_t)1 << (FIPS205_H / FIPS205_D));
-//
-//	return idxtree;
-//}
-
-
-
