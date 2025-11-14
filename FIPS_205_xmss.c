@@ -66,19 +66,6 @@ void FIPS205_AVX_xmss_node(
 			//setKeyPairAddress(adr, (uint32_t)i);
 		setKeyPairAddress(adr, (uint32_t)i);
 		//setAddress4_OLD(adr, ShortKeyPairAddressOFFSET_OLD, (uint32_t)i);
-
-		/*void FIPS205_wots_gen_pk_AVX(
-			uint8_t * pk,
-			const uint8_t * SK_seed,
-#ifdef SHAKE
-			const uint8_t * PK_seed;
-#else
-			const __m256i * pk_block,
-			const void* predcalc,
-#endif
-
-			uint8_t * adr);
-		*/
 		
 		FIPS205_AVX_wots_gen_pk(
 			PK_root,
@@ -146,21 +133,6 @@ void FIPS205_AVX_xmss_node(
 #endif
 		//11 : 𝑛𝑜𝑑𝑒 ← H(PK.seed, ADRS, 𝑙𝑛𝑜𝑑𝑒 ∥ 𝑟𝑛𝑜𝑑𝑒)
 
-//#ifdef SHAKE
-//		//HASH_with_predcalc_OLD(PK_root, PK_seed, adr, temp);
-//		AVX_H_with_predcalc(
-//			PK_root,
-//			PK_seed,
-//			Adr,
-//			temp);
-//#else
-		/*
-		void H_with_predcalc(
-	uint8_t* hash_value, 
-	const void* pk, 
-	uint8_t* Adr, 
-	const uint8_t Msg[2][FIPS205_N])
-		*/
 		// void H_with_predcalc (uint8_t* out, const void* pk, uint8_t* adr, const uint8_t Msg[2][N])
 		//H_with_predcalc(PK_root, PK_seed_n, adr, temp);
 		H_with_predcalc(
@@ -401,33 +373,6 @@ void FIPS205_AVX_xmss_sign_(
 		PK_seed_n,// single 256 or 512
 #endif
 		adr);
-	
-	
-	
-//	for (j = 0; j < FIPS205_H_; ++j)
-//	{
-//		// 2: 𝑘 ← ⌊𝑖𝑑𝑥/2𝑗⌋ ⊕ 1
-//		size_t k = (idx / ((uint64_t)1 << j)) ^ 1;
-//		// 3: AUTH[𝑗] ← xmss_node(SK.seed, 𝑘, 𝑗,PK.seed,ADRS)
-//
-//#ifdef SHAKE
-//		FIPS205_AVX_xmss_node(
-//			auth, SK_seed, k, j,
-//			const uint8_t * PK_seed,
-//			uint8_t * adr);
-//
-//		auth += FIPS205_N;
-//		//xmss_node_not_recurse_(auth[j], SK_seed, k, j, PK_seed, adr);
-//#else
-//
-//		FIPS205_AVX_xmss_node(auth, SK_seed, k, j, PK_seed, PK_seed_n, adr);
-//		auth += FIPS205_N;
-//
-//#endif
-//
-//
-//	}
-	// 5: ADRS.setTypeAndClear(WOTS_HASH)
 
 #ifdef SHAKE
 	SetAddressType4_0(adr, WOTS_HASH);
@@ -480,20 +425,6 @@ void FIPS205_AVX_xmss_pkFromSig(
 	const uint8_t* sig = SIGtmp;
 	const uint8_t* auth = SIGtmp + FIPS205_LEN * FIPS205_N, * pauth = auth;
 	
-	/*
-	FIPS205_AVX_wots_pkFromSig
-(
-	uint8_t pk[FIPS205_N],
-	const uint8_t sign[][FIPS205_N],
-	const uint8_t* M,
-#ifdef SHAKE
-	const uint8_t *pk,
-#else
-	const __m256i* blockstate256,
-	const void * pk_n,
-#endif
-	uint8_t* adr)
-	*/
 	FIPS205_AVX_wots_pkFromSig(
 		node, SIGtmp, Msg,
 #ifdef SHAKE
@@ -576,14 +507,6 @@ void FIPS205_AVX_xmss_pkFromSig(
 		idx >>= 1;
 
 	}
-	//memcpy(root, node[0], FIPS205_N);
-	//memcpy(root, node, FIPS205_N);
-	//#ifdef _GETTIME
-	//	tacts = __rdtsc() - tacts;
-	//	//printf("xmss_pkFromSig time = %I64d\n", tacts);
-	//	if (tacts < xmss_pkFromSigTime)
-	//		xmss_pkFromSigTime = tacts;
-	//#endif
 }
 
 
@@ -793,57 +716,6 @@ int test_xmss()
 
 	}
 	printf("xmss_node and xmss_node_ %s\n", res == 0 ? "OK" : "ERROR");
-
-
-	//#ifndef _DEBUG
-	//	min_tacts = 0xFFFFFFFFFFFFFFFF;
-	//	for (i = 0; i < 16; ++i)
-	//	{
-	//#endif
-	//		memcpy(l_adr, adr, sizeof(adr));
-	//#ifndef _DEBUG
-	//		tacts = __rdtsc();
-	//#endif
-	//		/*
-	//		void xmss_node_not_recurse__(
-	//	uint8_t* PK_root,
-	//	const uint8_t* SK_seed,
-	//	#ifdef SHAKE
-	//		const uint8_t* PK_seed,
-	//	#else
-	//		const void* PK_seed,
-	//		const void* PK_seed_n,
-	//	#endif
-	//	uint8_t* adr
-	//		*/
-	//		xmss_node_not_recurse__(PK_root2,
-	//			SK_seed, /*H_ - 1,*/
-	//			PK_seed,
-	//#ifndef SHAKE
-	//			PK_seed_n,
-	//#endif
-	//			l_adr);
-	//
-	//
-	//#ifndef _DEBUG
-	//		tacts = __rdtsc() - tacts;
-	//
-	//		if (tacts < min_tacts)
-	//			min_tacts = tacts;
-	//	}
-	//	printf("xmss_node_not_recurse__ time = %I64d\n", min_tacts);
-	//#endif
-	//	//int res = 0;
-	//	for (i = 0; i < FIPS205_N; ++i)
-	//	{
-	//		if (PK_root1[i] != PK_root2[i])
-	//			res = 1;
-	//
-	//	}
-	//	printf("xmss_node and xmss_node_not_recurse__ %s\n", res == 0 ? "OK" : "ERROR");
-	//
-
-
 		//////////////////////////////////////////////////////////////////
 	/*static */uint8_t SIGtmp1[FIPS205_N * (H_ + LEN)], SIGtmp2[FIPS205_N * (H_ + LEN)];
 #ifndef _DEBUG
@@ -969,5 +841,4 @@ int test_xmss()
 
 }
 #endif
-//#endif
 
