@@ -6,12 +6,7 @@
 int check_properties(int fun, uint32_t index, uint32_t bit);
 int check_sha256();
 int check_sha512();
-// out_len <= 32!
-// void AVX_sha256_device_predcalc_pk(uint32_t* state, uint8_t* pk, int n)
-//void AVX_sha256_device_predcalc_pk(uint32_t* state, uint8_t* pk, int n);
-//void AVX_sha256_device_compress(uint32_t* state, const uint8_t* in);
-//void AVX_sha256_device_WITH_PREDCALC(uint8_t* hash, uint32_t* predcalc_key, const uint8_t* in);
-//void AVX_sha256_device_predcalc_pk(uint32_t *state, uint8_t* data);
+
 void AVX_sha256_device_predcalc_pk_(__m256i state256[8], uint8_t* data);
 void AVX_sha256_device_compress(uint32_t state[8], const uint8_t* data);
 void AVX_sha256_device(uint8_t* out, const uint8_t* data, uint32_t length, uint32_t out_len);
