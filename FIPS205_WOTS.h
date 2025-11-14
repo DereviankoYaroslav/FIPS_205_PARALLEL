@@ -21,23 +21,17 @@
 void replace_blocks_key8__(__m256i blockdest_[16], __m256i blockkey256[8]);
 
 void FIPS205_wots_gen_sk_old(uint8_t sk[][FIPS205_N], const uint8_t* SK_seed, const uint8_t* PK_seed, const uint8_t* Adr);
-//void FIPS205_wots_gen_sk8(__m256i sk256[][8], const uint8_t* SK_seed, const uint32_t* state, const uint8_t* Adr);
 void FIPS205_wots_gen_common_part(__m256i dest[8][2], const uint8_t* SK_seed, const uint8_t* Adr);
 void FIPS205_wots_gen_common_part1(__m256i dest[2], const uint8_t* SK_seed, const uint8_t* Adr);
-//void FIPS205_wots_gen_sk8(__m256i sk256[][8], const __m256i* in256, /*const uint8_t* SK_seed, */const uint32_t* state /*const uint8_t* Adr*/);
 void FIPS205_wots_gen_sk8(__m256i sk256[]/*[8]*/, const __m256i* in256, /*const uint8_t* SK_seed, */const uint32_t* state /*const uint8_t* Adr*/);
 void FIPS205_wots_gen_pk8(__m256i* pk, const uint8_t* SK_seed, const uint32_t* state, uint8_t* Adr);
 void FIPS205_wots_gen_pk8_(__m256i* keys, const uint8_t* SK_seed, const uint32_t* state, uint8_t* Adr);
 void FIPS205_wots_gen_pk8__(__m256i* keys, const uint8_t* SK_seed, const __m256i* predcalc_block, uint8_t* Adr);
 void FIPS205_wots_genpk(uint8_t* pk, const uint8_t* SK_seed, const void* PK_seed, uint8_t* Adr);
 void FIPS205_wots_gen_pk(uint8_t pk[FIPS205_LEN][FIPS205_N], const uint8_t sk[FIPS205_LEN][FIPS205_N], const uint8_t* PK_seed, uint8_t* Adr);
-//void AVX_FIPS205_wots_chain8(uint8_t out[][FIPS205_N], const void* pk, const uint8_t sk[8][FIPS205_N], uint8_t* Adr, int i, int s, int ind);
 void AVX_FIPS205_wots_chain8(uint8_t out[][FIPS205_N], const void* pk, __m256i sk[8], uint8_t Adr[ADR_SIZE], int b, int e, int ind);
-//void simple_replace_key(uint8_t adr[22], __m256i key256, __m256i dest[2]);
 void simple_replace_key(__m256i dest[2], uint8_t adr[22], __m256i key256);
-//void simple_replace_key8(uint8_t adr[8][22], __m256i key256[8], __m256i dest[8][2]);
 void simple_replace_key8(__m256i dest[8][2], uint8_t adr[8][22], __m256i key256[8]);
-//void FIPS205_AVX_wots_gen_pk(uint8_t* pk, const __m256i* keys, const void* predcalc_key, uint8_t* adr);
 void FIPS205_wots_gen_common_pk(uint8_t* pk, const __m256i* keys, const void* predcalc_key, uint8_t* adr);
 void FIPS205_wots_gen_pk_old(uint8_t pk[FIPS205_LEN][FIPS205_N], const uint8_t sk[FIPS205_LEN][FIPS205_N], const uint8_t* PK_seed, uint8_t* Adr);
 void FIPS205_wots_gen_common_pk_old(uint8_t common_pk[FIPS205_N], const uint8_t pk[FIPS205_LEN][FIPS205_N], const uint8_t* PK_seed, uint8_t* Adr);
@@ -65,20 +59,7 @@ void FIPS205_wots_gen_pk_new__(
 	const uint8_t* SK_seed,
 	//const __m256i* keysBlocks,
 	const __m256i* state256_block,
-//#if FIPS205_N > 16
-//	const __m256i* state512,
-//#endif
 	uint8_t* adr);
-
-//void FIPS205_AVX_wots_gen_pks(
-//	uint8_t pk[][FIPS205_N],
-//	const uint8_t* SK_seed,
-//	//const __m256i* keysBlocks,
-//	const __m256i* state256,
-//#if FIPS205_N > 16
-//	const __m256i* state512,
-//#endif
-//	uint8_t* adr);
 
 void FIPS205_AVX_wots_gen_pks(
 	uint8_t* pk,
@@ -124,12 +105,6 @@ void FIPS205_wots_gen_sign_new(uint8_t sign[][FIPS205_N], const uint8_t* M, cons
 void FIPS205_wots_gen_sign_new_(uint8_t sign[][FIPS205_N], const uint8_t* M, const uint8_t* SK_seed, const __m256i* state256, const __m256i blocksstate256[8], uint8_t* adr);
 void FIPS205_AVX_wots_sign(uint8_t sign[][FIPS205_N], const uint8_t* M, const uint8_t* SK_seed, /*const __m256i* state256, */const __m256i* blockstate256, uint8_t* adr);
 void FIPS205_wots_gen_sign_new___(uint8_t sign[][FIPS205_N], const uint8_t* M, const uint8_t* SK_seed, /*const __m256i* state256, */const __m256i* blockstate256, uint8_t* adr);
-
-//void FIPS205_wots_gen_sig____(
-//	__m256i* sign,
-//	const uint8_t* SK_seed,
-//	const __m256i* state256,
-//	uint8_t* adr);
 
 void FIPS205_wots_gen_pkFromSig_old(uint8_t pk[][FIPS205_N],
 	const uint8_t sign[][FIPS205_N],
