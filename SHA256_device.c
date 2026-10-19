@@ -23,26 +23,32 @@
   #include <intrin.h>
 #else
   #include <cpuid.h>
+  #include <immintrin.h>
   #define __cpuidex(info, func, subfunc) \
   __cpuid_count(func, subfunc, (info)[0], (info)[1], (info)[2], (info)[3])
 #endif
 
-int check_properties(int fun, uint32_t index, uint32_t bit) {
+int check_properties(int fun, uint32_t subfun, uint32_t index, uint32_t bit) {
     uint32_t r[4];
-    uint32_t mask = 1 << bit;
-    __cpuidex((int*)r, fun, 0);
+    uint32_t mask = 1u << bit;
+    __cpuidex((int*)r, fun, subfun);
     return (r[index] & mask) == mask;
 }
-int check_sha256()
-{
-	return check_properties(7, 1, 29);
-		
+
+int check_sha256() {
+    return check_properties(7, 0, 1, 29);   // leaf 7.0, EBX, bit 29
 }
 
-int check_sha512()
-{
-	return check_properties(7, 0, 0);
+int check_sha512() {
+    return check_properties(7, 1, 0, 0);    // leaf 7.1, EAX, bit 0
+}
 
+int is_sha512_usable(void) {
+    uint32_t r[4];
+    __cpuidex((int*)r, 1, 0);
+    if (!((r[2] >> 27) & 1)) return 0;        /* OSXSAVE */
+    if ((_xgetbv(0) & 0x6) != 0x6) return 0;  /* XMM + YMM state */
+    return check_sha512();
 }
 
 // https://github.com/noloader/SHA-Intrinsics/blob/master/sha256-x86.c

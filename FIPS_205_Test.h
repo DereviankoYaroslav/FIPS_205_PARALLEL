@@ -4,7 +4,7 @@ int test_AVX_const();
 int test_fun_128();
 int test_calc_w();
 int test_sha512();
-test_sha512_with_predcalc();
+int test_sha512_with_predcalc();
 //int test_AVX_sha256_compress4();
 int test_AVX_sha256();
 int test_MGF1_AVX_sha256();

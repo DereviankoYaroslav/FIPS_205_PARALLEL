@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
 #include "FIPS_205_Params.h"
 
@@ -28,8 +28,25 @@ size_t smodes_count = sizeof(smodes) / sizeof(smodes[0]);
 
 
 
-
 #ifdef _JSON_FILE
+
+/*
+ * Capacity of the fixed arrays declared in FIPS_205_JSon.h, taken from the
+ * header itself so nothing here has to be kept in sync by hand.
+ */
+#define MAX_TESTS	((int)(sizeof(((PJSON_TEST_GROUP)0)->tests) / sizeof(TEST)))
+
+/*
+ * The current ACVP files have 72 test groups for sigGen and 36 for sigVer,
+ * so JSON.groups[30] is too small.  TestJsonFile allocates its own array and
+ * tells ReadGroups how big it is through this variable, which keeps the
+ * ReadGroups prototype in FIPS_205_JSon.h unchanged.
+ */
+static int groups_capacity = 0;
+
+/* default message-length window when the group carries no messageLengths */
+#define DEFAULT_MSG_BITS_MIN	8
+#define DEFAULT_MSG_BITS_MAX	(8192 * 8)
 
 int to_digit(char c)
 {
@@ -46,172 +63,224 @@ int to_digit(char c)
 
 uint8_t* SkipEmptySymbols(uint8_t* cur)
 {
-	while (*cur == ' ' || *cur == '\r' || *cur == '\n')
+	if (cur == 0)
+		return cur;
+	while (*cur == ' ' || *cur == '\t' || *cur == '\r' || *cur == '\n')
 		++cur;
 	return cur;
+}
+
+/*
+ * Bounded label search.  strstr would run to the end of the whole file, which
+ * both crashes on a missing label and silently picks up a field belonging to
+ * the next test case.  Everything below goes through this instead.
+ * Returns a pointer to the first character AFTER the label, or 0.
+ */
+static uint8_t* find_label(uint8_t* cur, uint8_t* end, const char* label)
+{
+	size_t n;
+
+	if (cur == 0 || end == 0 || label == 0)
+		return 0;
+	n = strlen(label);
+	if (n == 0 || (size_t)(end - cur) < n)
+		return 0;
+	for (; cur + n <= end; ++cur)
+	{
+		if (*cur == (uint8_t)label[0] && memcmp(cur, label, n) == 0)
+			return cur + n;
+	}
+	return 0;
+}
+
+/*
+ * Step over the ':' that separates a label from its value, plus the
+ * whitespace on either side of it.
+ */
+static uint8_t* skip_colon(uint8_t* p, uint8_t* end)
+{
+	if (p == 0)
+		return 0;
+	p = SkipEmptySymbols(p);
+	if (p < end && *p == ':')
+		++p;
+	return SkipEmptySymbols(p);
 }
 
 uint8_t* ReadJsonHex(uint8_t* dest, uint8_t* start, size_t count)
 {
 	uint8_t *cur = start;
 	size_t size = count , i ;
-	//uint8_t value;
+
+	if (cur == 0)
+		return 0;
 	for (i = 0; i < size; ++i)
 	{
-		
-		
 		int d1 = to_digit(cur[2 * i]);
 		int d2 = to_digit(cur[2 * i + 1]);
+		if (d1 == 0xFF || d2 == 0xFF)
+			return 0;
 		dest[i] = (uint8_t)(d1 * 16 + d2);
 	}
 	return cur + 2 * count + 1;
 
 }
-uint8_t* ReadJsonInt(int* value_, uint8_t * cur, char* label)
+
+uint8_t* ReadJsonInt(int* value_, uint8_t * cur, uint8_t * end, char* label)
 {
+	uint8_t* p;
+
 	if (cur == 0)
 		return cur;
 	cur = SkipEmptySymbols(cur);
-	uint8_t* p = strstr(cur, label), *pend/* = strchr (p, ',')*/;
+	p = find_label(cur, end, label);
+	if (p == 0)
+		return 0;                       /* label absent - was a crash before */
 
-	if (p /*&& pend*/)
 	{
-		p = p + strlen(label);
-		int value = 0;
-		while (/*(size_t)p < (size_t)pend*/*p >= '0' && *p <= '9')
+		int value = 0, any = 0;
+		p = skip_colon(p, end);
+		while (p < end && *p >= '0' && *p <= '9')
 		{
-			//if (*p >= '0' && *p <= '9')
-			{
-				value = value * 10 + (*p - '0');
-			}
+			value = value * 10 + (*p - '0');
 			++p;
+			any = 1;
 		}
+		if (!any)
+			return 0;
 		*value_ = value;
-		//++pend;
-		++p;
-		
 	}
-	//return pend;
 	return p;
 }
 
-uint8_t* ReadJsonBool(int* value_, uint8_t* cur, char* label)
+uint8_t* ReadJsonBool(int* value_, uint8_t* cur, uint8_t* end, char* label)
 {
+	uint8_t* p;
+
 	if (cur == 0)
 		return cur;
 	cur = SkipEmptySymbols(cur);
-	uint8_t* p = strstr(cur, label), * pend = strchr(p, ',');
-	if (p && pend)
+	p = find_label(cur, end, label);
+	if (p == 0)
+		return 0;
+
+	p = skip_colon(p, end);
+	if ((size_t)(end - p) >= 4 && strncmp((char*)p, "true", 4) == 0)
 	{
-		p = p + strlen(label);
-		int value = 0;
-		p = SkipEmptySymbols(p);
-		if (strncmp(p, "true,", 5) == 0)
-		{
-			value = 1;
-			p += 5;
-		}
-		else
-		{
-			if (strncmp(p, "false,", 6) == 0)
-			{
-				value = 0;
-				p += 6;
-			}
-			else
-				p = 0;
-		}
-		*value_ = value;
-		
-
+		*value_ = 1;
+		p += 4;
 	}
+	else if ((size_t)(end - p) >= 5 && strncmp((char*)p, "false", 5) == 0)
+	{
+		*value_ = 0;
+		p += 5;
+	}
+	else
+		return 0;
+
 	return p;
 }
 
-uint8_t* ReadJsonLabel(uint8_t* cur, uint8_t* label, uint8_t end_symb)
+uint8_t* ReadJsonLabel(uint8_t* cur, uint8_t* end, char* label, uint8_t end_symb)
 {
+	uint8_t* p;
+
 	if (cur == 0)
 		return cur;
 	cur = SkipEmptySymbols(cur);
-	uint8_t* p = strstr(cur, label),
-		* pend = p + strlen(label);
-	pend = strchr(pend, end_symb);
-	return pend;
+	p = find_label(cur, end, label);
+	if (p == 0)
+		return 0;                       /* this is the line that used to fault */
+	while (p < end && *p != end_symb)
+		++p;
+	return (p < end) ? p : 0;
 }
 
-uint8_t *ReadJson16CharCount(int *size, uint8_t* cur, char* label)
+uint8_t *ReadJson16CharCount(int *size, uint8_t* cur, uint8_t* end, char* label)
 {
-	
 	int count;
 	uint8_t* start = cur, *finish;
-	start = ReadJsonLabel(start, label, '\"');
+
+	*size = 0;
+	start = ReadJsonLabel(start, end, label, '\"');
+	if (start == 0)
+		return 0;
 	finish = start + 1;
-	while (*finish++ != '\"');
+	while (finish < end && *finish != '\"')
+		++finish;
+	if (finish >= end)
+		return 0;
+	++finish;                               /* one past the closing quote */
 	count = (int)(finish - start);
 
-	
 	*size = count - 2;
 	return start ;
 }
 
-uint8_t* ReadJsonMessageLen(PJSON_TEST_MESSAGE_LENGTH p, uint8_t* cur)
+/*
+ * The current ACVP vector sets carry no "messageLengths" member, so its
+ * absence is normal and the function falls back to a permissive window
+ * instead of walking off the buffer looking for '{' and ']'.
+ */
+uint8_t* ReadJsonMessageLen(PJSON_TEST_MESSAGE_LENGTH p, uint8_t* cur, uint8_t* end)
 {
-	cur = ReadJsonLabel(cur, "\"messageLengths\": ", '[');
-	while (*cur != '{')
-	{
-		++cur;
-	}
-	++cur;
-	cur = ReadJsonInt(&p->min, cur, "\"min\": ");
-	cur = ReadJsonInt(&p->max, cur, "\"max\": ");
-	cur = ReadJsonInt(&p->increment, cur, "\"increment\": " );
-	while (*cur != ']')
-	{
-		++cur;
-	}
+	uint8_t* q;
 
-	while (*cur != ',')
-	{
-		++cur;
-	}
+	p->min = DEFAULT_MSG_BITS_MIN;
+	p->max = DEFAULT_MSG_BITS_MAX;
+	p->increment = 8;
 
-	return cur++;
+	if (cur == 0)
+		return cur;
+
+	q = ReadJsonLabel(cur, end, "\"messageLengths\"", '[');
+	if (q == 0)
+		return cur;                     /* absent: keep the defaults */
+
+	while (q < end && *q != '{')
+		++q;
+	if (q >= end)
+		return cur;
+	++q;
+	q = ReadJsonInt(&p->min, q, end, "\"min\"");
+	q = ReadJsonInt(&p->max, q, end, "\"max\"");
+	q = ReadJsonInt(&p->increment, q, end, "\"increment\"");
+	if (q == 0)
+	{
+		p->min = DEFAULT_MSG_BITS_MIN;
+		p->max = DEFAULT_MSG_BITS_MAX;
+		p->increment = 8;
+		return cur;
+	}
+	return q;
 }
 
-uint8_t* ReadJsonChar(uint8_t *value_, uint8_t* cur, char* label)
+uint8_t* ReadJsonChar(uint8_t *value_, uint8_t* cur, uint8_t* end, char* label)
 {
+	uint8_t* p;
+
+	*value_ = 0;
 	if (cur == 0)
 		return cur;
 	cur = SkipEmptySymbols(cur);
-	uint8_t* p = strstr(cur, label), * pend = strchr(p, ',');
-	if (p && pend)
-	{
-		p = p + strlen(label);
-		
-		while ((size_t)p < (size_t)pend)
-		{
+	p = find_label(cur, end, label);
+	if (p == 0)
+		return 0;
 
-			if (*p == '\"')
-				break;
-			++p;
-		}
+	while (p < end && *p != '\"')           /* opening quote of the value */
 		++p;
-		while ((size_t)p < (size_t)pend)
-		{
-			if (*p == '\"')
-				break;
-			*value_++ = *p++;
-		}
-		*value_ = 0;
-		++pend;
-
-
-	}
-	return pend;
+	if (p >= end)
+		return 0;
+	++p;
+	while (p < end && *p != '\"')
+		*value_++ = *p++;
+	*value_ = 0;
+	if (p >= end)
+		return 0;
+	return p + 1;
 }
 
-uint8_t *ReadJsonTitle(PJSON  json_datas, uint8_t *src) {
-	//size_t groups_count;
+uint8_t *ReadJsonTitle(PJSON  json_datas, uint8_t *src, uint8_t *end) {
 	uint8_t *cur = src;
 	int value;
 	if (cur == 0)
@@ -219,33 +288,40 @@ uint8_t *ReadJsonTitle(PJSON  json_datas, uint8_t *src) {
 	cur = SkipEmptySymbols(cur);
 	if (*cur == '{')
 	{
-		char mode[8];
+		char mode[16];
 		++cur;
 
-		cur = ReadJsonInt(&value, cur, "\"vsId\": ");
-			json_datas->vsId = value;
-		cur = ReadJsonChar(json_datas->Algorithm, cur, "\"algorithm\": ");
-		if (strcmp (json_datas->Algorithm,  ALGORITHM))
+		cur = ReadJsonInt(&value, cur, end, "\"vsId\"");
+		if (cur == 0)
 			return 0;
-		cur = ReadJsonChar(mode, cur, "\"mode\": ");
+		json_datas->vsId = value;
+
+		cur = ReadJsonChar((uint8_t*)json_datas->Algorithm, cur, end, "\"algorithm\"");
+		if (cur == 0 || strcmp (json_datas->Algorithm,  ALGORITHM))
+			return 0;
+
+		mode[0] = 0;
+		cur = ReadJsonChar((uint8_t*)mode, cur, end, "\"mode\"");
+		if (cur == 0)
+			return 0;
 		json_datas->Mode = -1;
-		if (strcmp(mode, "keyGen") == 0)
+		if (strcmp(mode, KEYGEN) == 0)
 		{
 			json_datas->Mode = KEYGEN_TYPE;
 		}
 		else
 		{
-			if (strcmp(mode, "sigGen") == 0)
+			if (strcmp(mode, SIGGEN) == 0)
 				json_datas->Mode = SIGGEN_TYPE;
-			else if (strcmp(mode, "sigVer") == 0)
+			else if (strcmp(mode, SIGVER) == 0)
 				json_datas->Mode = SIGVER_TYPE;
 		}
 		if (json_datas->Mode == -1)
 			return 0;
 
-		cur = ReadJsonChar(json_datas->Revision, cur, "\"revision\": ");
+		cur = ReadJsonChar((uint8_t*)json_datas->Revision, cur, end, "\"revision\"");
 		// "FIPS205"
-		if (strcmp(json_datas->Revision, "FIPS205"))
+		if (cur == 0 || strcmp(json_datas->Revision, "FIPS205"))
 			return 0;
 
 	}
@@ -255,7 +331,11 @@ uint8_t *ReadJsonTitle(PJSON  json_datas, uint8_t *src) {
 uint8_t *skip_quot(uint8_t* cur)
 {
 	while (*cur != 0 && *cur != '\"')
+	{
+		if (*cur == '\\' && cur[1] != 0)
+			++cur;
 		++cur;
+	}
 	if (*cur == '\"')
 		++cur;
 	return cur;
@@ -263,46 +343,38 @@ uint8_t *skip_quot(uint8_t* cur)
 
 int ReadGroups(PJSON_TEST_GROUP group, uint8_t* begin_cur)
 {
-	char* end_cur = 0;
-	char* cur = begin_cur;
-	
+	uint8_t* cur = begin_cur;
+
 	char start_symb = '{', end_symb = '}';
-	size_t count = 0;
-	size_t count_cav = 0;
+	int count = 0;
 
 	int groups_count = 0;
 
-
 	while (*cur)
 	{
+		if (groups_count >= groups_capacity)     /* was unbounded */
+			break;
+
 		cur = SkipEmptySymbols(cur);
 		if (*cur == 0)
 			break;
-		/*if (*cur == '\"')
-		{
-			++cur;
-			cur = skip_quot(cur);
-		}*/
 		while (*cur && *cur != start_symb)
 			cur++;
 		if (*cur == 0)
 			break;
 		group[groups_count].start = cur;
 
-		
 		count = 1;
-		
+
 		++cur;
 		while (*cur != 0)
 		{
-			cur = SkipEmptySymbols(cur);
 			if (*cur == '\"')
 			{
 				++cur;
 				cur = skip_quot(cur);
+				continue;
 			}
-			if (*cur == 0)
-				break;
 			if (*cur == start_symb)
 				++count;
 			if (*cur == end_symb)
@@ -318,31 +390,51 @@ int ReadGroups(PJSON_TEST_GROUP group, uint8_t* begin_cur)
 		}
 	}
 
-	
+
 	return groups_count ;
 }
 
 
 uint8_t *ReadJsonFile(size_t * size, const char* fn )
 {
-	SUCCESS success = ERROR;
-	uint8_t* p = 0;
-	FILE* f = fopen(fn, "rt");
-	if (f)
+	FILE* f;
+	long n;
+	uint8_t* p;
+	size_t got;
+	char pathbuf[512];
+
+#ifndef _WIN32
+	/* the path macros in FIPS_205_JSon.h use Windows separators */
 	{
-		fseek(f, 0, SEEK_END);
-		size_t fsize = ftell(f);
-		fseek(f, 0, SEEK_SET);
-		p = malloc(fsize);
-		if (p)
+		size_t i, len = strlen(fn);
+		if (len + 1 <= sizeof(pathbuf))
 		{
-			success = OK;
-			fread(p, 1, fsize, f);
-			fclose(f);
-			
+			for (i = 0; i <= len; ++i)
+				pathbuf[i] = (fn[i] == '\\') ? '/' : fn[i];
+			fn = pathbuf;
 		}
-		*size = fsize;
 	}
+#else
+	(void)pathbuf;
+#endif
+
+	*size = 0;
+	f = fopen(fn, "rb");
+	if (!f)
+	{
+		printf("JSON: cannot open %s\n", fn);
+		return 0;
+	}
+	if (fseek(f, 0, SEEK_END) != 0) { fclose(f); return 0; }
+	n = ftell(f);
+	if (n < 0)                      { fclose(f); return 0; }
+	rewind(f);
+	p = (uint8_t*)malloc((size_t)n + 1);
+	if (!p)                         { fclose(f); return 0; }
+	got = fread(p, 1, (size_t)n, f);
+	fclose(f);
+	p[got] = 0;
+	*size = got;
 	return p;
 }
 
@@ -350,42 +442,49 @@ int ReadJsonTests(PTEST tests, uint8_t* cur_begin, uint8_t* cur_end)
 {
 	int count = 0;
 	uint8_t* cur;
-	cur_begin = ReadJsonLabel(cur_begin, "\"tests\": ", '[');
-	//while (*cur_begin != '[')
+
+	cur_begin = ReadJsonLabel(cur_begin, cur_end, "\"tests\"", '[');
+	if (cur_begin == 0)
+		return 0;
 	++cur_begin;
-	while (*cur_end != ']')
-		--cur_end;
+
 	cur = cur_begin;
-	while ((size_t)cur < (size_t)cur_end)
+	while (cur < cur_end && count < MAX_TESTS)
 	{
-		
-		while (*cur != '{' && (size_t)cur < (size_t)cur_end)
+		int depth;
+
+		while (cur < cur_end && *cur != '{')
 			++cur;
-		if ((size_t)cur >= (size_t)cur_end)
+		if (cur >= cur_end)
 			break;
+
 		tests[count].start = cur;
-		cur = ReadJsonInt(&tests[count].tcId, cur, "\"tcId\": ");
-		int b_quat = 0;
-		while (1)
+		tests[count].tcId = 0;
+		depth = 0;
+		while (cur < cur_end)
 		{
-			++cur;
-			cur = SkipEmptySymbols(cur);
-			if (*cur == 0 || (size_t)cur >= (size_t)cur_end)
-				break;
-			
 			if (*cur == '\"')
 			{
-				b_quat ^= 1;
+				++cur;
+				cur = skip_quot(cur);
+				continue;
 			}
-			if (*cur == '}' && !b_quat)
+			if (*cur == '{')
+				++depth;
+			else if (*cur == '}')
 			{
-				tests[count].finish = cur;
-				break;
+				--depth;
+				if (depth == 0)
+					break;
 			}
+			++cur;
 		}
-		if (*cur == 0)
+		if (cur >= cur_end)
 			break;
+		tests[count].finish = cur;
+		ReadJsonInt(&tests[count].tcId, tests[count].start, tests[count].finish, "\"tcId\"");
 		++count;
+		++cur;
 	}
 
 	return count ;
@@ -396,45 +495,48 @@ SUCCESS ReadJsonSigGen(uint8_t* sk, uint8_t* sig, uint8_t* msg, int* msg_len, ui
 {
 	SUCCESS success = ERROR;
 	uint8_t* cur = test->start, * cur_end = test->finish;
+	uint8_t* p;
 	int count;
-	cur = ReadJson16CharCount(&count, cur, "\"sk\": ");
-	if (count / 2 == FIPS205_SK_BYTES)
+
+	*is_prnd = 0;
+	*msg_len = 0;
+
+	cur = ReadJson16CharCount(&count, cur, cur_end, "\"sk\"");
+	if (cur && count / 2 == FIPS205_SK_BYTES)
 	{
 		cur = ReadJsonHex(sk, cur + 1, count / 2);
-		// "additionalRandomness": 
-		uint8_t *temp_cur;
-		*is_prnd = 0;
-		//cur = ReadJson16CharCount(&count, cur, "\"additionalRandomness\": ");
-		temp_cur = ReadJsonLabel(cur, "\"additionalRandomness\": ", '\"');
-		if (temp_cur != 0 && (temp_cur - cur) < 100)
+
+		/*
+		 * "additionalRandomness" is present only in the non-deterministic
+		 * groups, so its absence is normal and must not be an error.
+		 */
+		p = ReadJson16CharCount(&count, test->start, cur_end, "\"additionalRandomness\"");
+		if (p != 0 && count / 2 == FIPS205_N)
 		{
-			cur = ReadJson16CharCount(&count, cur, "\"additionalRandomness\": ");
-			if (count / 2 == FIPS205_N)
-			{
-				cur = ReadJsonHex(prnd, cur + 1, count / 2);
+			if (ReadJsonHex(prnd, p + 1, count / 2) != 0)
 				*is_prnd = 1;
-			}
 		}
-		
-		cur = ReadJsonInt(msg_len, cur, "\"messageLength\": ");
-		if (*msg_len <= max_msg)
+
+		/*
+		 * "messageLength" no longer exists in the ACVP files; the length is
+		 * taken from the "message" hex string itself.  msg_len stays in bits
+		 * so the callers keep using m_len / 8.
+		 */
+		cur = ReadJson16CharCount(&count, cur, cur_end, "\"message\"");
+		if (cur && count >= 0 && (size_t)(count / 2) * 8 <= max_msg)
 		{
-			cur = ReadJson16CharCount(&count, cur, "\"message\": ");
-			if (count / 2 == *msg_len / 8)
+			*msg_len = (count / 2) * 8;
+			cur = ReadJsonHex(msg, cur + 1, count / 2);
+			cur = ReadJson16CharCount(&count, cur, cur_end, "\"signature\"");
+			if (cur && count / 2 == FIPS205_SIG_BYTES)
 			{
-				cur = ReadJsonHex(msg, cur + 1, count / 2);
-				cur = ReadJson16CharCount(&count, cur, "\"signature\": ");
-				if (count / 2 == FIPS205_SIG_BYTES)
-				{
-					cur = ReadJsonHex(sig, cur + 1, count / 2);
+				cur = ReadJsonHex(sig, cur + 1, count / 2);
+				if (cur)
 					success = OK;
-				}
-
-
 			}
 		}
 	}
-	
+
 	return success;
 }
 
@@ -442,118 +544,152 @@ SUCCESS ReadJsonGroupTitle(PJSON_TEST_GROUP group, int mode)
 {
 	SUCCESS success = ERROR;
 	uint8_t* cur, * end_cur;
+	char temp[32];
+	int value, j;
+
 	cur = group->start;
 	end_cur = group->finish;
-	char temp[24];
-	int value, j;
+
+	group->parameterSet = -1;
+	group->deterministic = 1;
+	strcpy(group->preHash, "none");
 
 	if (*cur == '{' && *end_cur == '}')
 	{
 		++cur;
-		--end_cur;
 
-		cur = ReadJsonInt(&value, cur, "\"tgId\": ");
+		cur = ReadJsonInt(&value, cur, end_cur, "\"tgId\"");
+		if (cur == 0)
+			return ERROR;
 		group->tgId = value;
+
 		// "parameterSet"
-		cur = ReadJsonChar(temp, cur, "\"parameterSet\": ");
-		if (cur && ((size_t)cur < (size_t)end_cur))
+		cur = ReadJsonChar((uint8_t*)temp, cur, end_cur, "\"parameterSet\"");
+		if (cur == 0)
+			return ERROR;
+		for (j = 0; j < (int)smodes_count; ++j)
 		{
-			for (j = 0; j < smodes_count; ++j)
+			if (strcmp(smodes[j], temp) == 0)
 			{
-				if (strcmp(smodes[j], temp) == 0)
-				{
-					group->parameterSet = j;
-					break;
-				}
-			}
-			if (j != smodes_count)
-			{
-				success = OK;
-				if (mode != KEYGEN_TYPE)
-				{
-					cur = ReadJsonMessageLen(&group->jtml, cur);
-
-				}
-
+				group->parameterSet = j;
+				break;
 			}
 		}
-		if (cur && ((size_t)cur < (size_t)end_cur))
+		if (group->parameterSet < 0)
+			return ERROR;
+
+		success = OK;
+
+		/*
+		 * Groups are now tagged with signatureInterface and preHash.  Only
+		 * signatureInterface == "internal" with preHash == "none" can be
+		 * checked against FIPS205_sign_internal / FIPS205_verify_internal;
+		 * the rest need the M' wrapper (context string and domain
+		 * separator).  preHash is reused as the skip marker so the layout in
+		 * FIPS_205_JSon.h stays as it is.
+		 */
+		temp[0] = 0;
+		if (ReadJsonChar((uint8_t*)temp, group->start, end_cur, "\"signatureInterface\"") != 0)
 		{
-			cur = ReadJsonLabel(cur, "\"tests\": ", '[');
-			if (cur && ((size_t)cur < (size_t)end_cur))
-				success = OK;
+			if (strcmp(temp, "internal") != 0)
+				strcpy(group->preHash, "skip");
 		}
+		temp[0] = 0;
+		if (ReadJsonChar((uint8_t*)temp, group->start, end_cur, "\"preHash\"") != 0)
+		{
+			if (strcmp(temp, "none") != 0)
+				strcpy(group->preHash, "skip");
+		}
+
+		if (ReadJsonBool(&value, group->start, end_cur, "\"deterministic\"") != 0)
+			group->deterministic = value;
+
+		if (mode != KEYGEN_TYPE)
+			ReadJsonMessageLen(&group->jtml, cur, end_cur);
+		else
+		{
+			group->jtml.min = DEFAULT_MSG_BITS_MIN;
+			group->jtml.max = DEFAULT_MSG_BITS_MAX;
+			group->jtml.increment = 8;
+		}
+
+		if (ReadJsonLabel(group->start, end_cur, "\"tests\"", '[') == 0)
+			success = ERROR;
 	}
 	return success;
 }
 
+/*
+ * FIPS205_keygen_internal caches the PK.seed precomputation behind
+ * is_predcalc_pk_* and never invalidates it, so the cache has to be dropped
+ * between test cases - every vector uses a different PK.seed.
+ */
+static void reset_predcalc(void)
+{
+#ifndef SHAKE
+	is_predcalc_pk_256 = 0;
+#if FIPS205_N != 16
+	is_predcalc_pk_512 = 0;
+#endif
+#endif
+}
+
 SUCCESS JsonSigGen(PJSON_TEST_GROUP groups, int groups_count)
 {
-	SUCCESS success = ERROR;
-	int i, j;
-	//uint8_t* cur;
+	SUCCESS success = ERROR, overall = ERROR;
+	int i, j, executed = 0;
 	static uint8_t sk[FIPS205_SK_BYTES], sig[FIPS205_SIG_BYTES], read_sig [FIPS205_SIG_BYTES], rnd [FIPS205_N];
 	uint8_t* m;
-	int m_len, /*sig_len, */is_rnd;
+	int m_len, is_rnd;
+
 	for (i = 0; i < groups_count; ++i)
 	{
+		if (ReadJsonGroupTitle(&groups[i], SIGGEN_TYPE) != OK)
+			continue;
 
-		/*if (m)
-		{*/
-		//cur = groups[i].start;
-		/*if (i == 13)
-			printf("");*/
-		success = ReadJsonGroupTitle(&groups[i], SIGGEN_TYPE);
-		if (success == OK)
+		if (groups[i].parameterSet != FIPS_205_MODE)
+			continue;
+		if (strcmp(groups[i].preHash, "none") != 0)
+			continue;                       /* external / pre-hash group */
+
+		m = malloc(groups[i].jtml.max / 8);
+		if (m)
 		{
-			
-			if (groups[i].parameterSet == FIPS_205_MODE)
+			int tests = ReadJsonTests(groups[i].tests, groups[i].start, groups[i].finish);
+
+			for (j = 0; j < tests; ++j)
 			{
-				success = ERROR;
-				size_t max_msg_value = (size_t)groups[i].jtml.max;
-				m = malloc(groups[i].jtml.max / 8);
-				if (m)
+				success = ReadJsonSigGen(sk, read_sig, m, &m_len, rnd, &is_rnd,
+							 &groups[i].tests[j], (size_t)groups[i].jtml.max);
+
+				if (success == OK)
 				{
-					//success = OK;
-					int tests = ReadJsonTests(groups[i].tests, groups[i].start, groups[i].finish);
+					reset_predcalc();
+					memset(sig, 0, FIPS205_SIG_BYTES);
+					if (is_rnd)
+						FIPS205_sign_internal_new__(sig, m, m_len / 8, sk, rnd);
+					else
+						FIPS205_sign_internal_new__(sig, m, m_len / 8, sk, sk + 2 * FIPS205_N);
 
-					for (j = 0; j < tests; ++j)
-					{
-						success = ReadJsonSigGen(sk, read_sig, m, &m_len, rnd, &is_rnd, &groups[i].tests[j], max_msg_value);
+					if (memcmp(read_sig, sig, FIPS205_SIG_BYTES) != 0)
+						success = ERROR;
 
-						if (success == OK)
-						{
-							if (is_rnd)
-								FIPS205_sign_internal(sig, m, m_len / 8, sk, rnd);
-							else
-							{
-								FIPS205_sign_internal(sig, m, m_len / 8, sk, sk + 2 * FIPS205_N);
-							}
-							
-								
-						}
-						//success |= memcmp(read_sig, sig, FIPS205_SIG_BYTES) != 0;
-						for (int k = 0; k < FIPS205_SIG_BYTES; ++k)
-						{
-							if (read_sig[k] != sig[k])
-							{
-								printf("k = %d read_sig[k] = %x sig[k] = %x\n", k, read_sig[k], sig[k]);
-								success = 1;
-								break;
-							}
-						}
-						
-						printf("%s\tSIGGEN\ttest %d %s\n", smodes[FIPS_205_MODE], groups[i].tests[j].tcId, success == OK ? "OK" : "ERROR");
-					}
-					free(m);
+					++executed;
+					if (success != OK)
+						overall = ERROR;
+					else if (executed == 1)
+						overall = OK;
 				}
-				
+				else
+					overall = ERROR;
+
+				printf("%s\tSIGGEN\ttest %d %s\n", smodes[FIPS_205_MODE],
+				       groups[i].tests[j].tcId, success == OK ? "OK" : "ERROR");
 			}
+			free(m);
 		}
 	}
-	return success;
-
-	
+	return executed ? overall : ERROR;
 }
 
 
@@ -564,79 +700,96 @@ SUCCESS ReadJsonKeyGen(uint8_t* sk, uint8_t* pk, uint8_t* pkSeed, uint8_t* skSee
 	SUCCESS success = ERROR;
 	uint8_t* cur = test->start, * cur_end = test->finish;
 	int count;
-	cur = ReadJson16CharCount(&count, cur, "\"skSeed\": ");
-	if (count / 2 == FIPS205_N)
+
+	cur = ReadJson16CharCount(&count, cur, cur_end, "\"skSeed\"");
+	if (cur && count / 2 == FIPS205_N)
 	{
 		cur = ReadJsonHex(skSeed, cur + 1, count / 2);
-		cur = ReadJson16CharCount(&count, cur, "\"skPrf\": ");
-		if (count / 2 == FIPS205_N)
+		cur = ReadJson16CharCount(&count, cur, cur_end, "\"skPrf\"");
+		if (cur && count / 2 == FIPS205_N)
 		{
 			cur = ReadJsonHex(skPrf, cur + 1, count / 2);
-			cur = ReadJson16CharCount(&count, cur, "\"pkSeed\": ");
-			if (count / 2 == FIPS205_N)
+			cur = ReadJson16CharCount(&count, cur, cur_end, "\"pkSeed\"");
+			if (cur && count / 2 == FIPS205_N)
 			{
 				cur = ReadJsonHex(pkSeed, cur + 1, count / 2);
 
-				cur = ReadJson16CharCount(&count, cur, "\"sk\": ");
-				if (count / 2 == FIPS205_SK_BYTES)
+				cur = ReadJson16CharCount(&count, cur, cur_end, "\"sk\"");
+				if (cur && count / 2 == FIPS205_SK_BYTES)
 				{
 					cur = ReadJsonHex(sk, cur + 1, count / 2);
 
-					cur = ReadJson16CharCount(&count, cur, "\"pk\": ");
-					if (count / 2 == FIPS205_PK_BYTES)
+					cur = ReadJson16CharCount(&count, cur, cur_end, "\"pk\"");
+					if (cur && count / 2 == FIPS205_PK_BYTES)
 					{
 						cur = ReadJsonHex(pk, cur + 1, count / 2);
-						success = OK;
+						if (cur)
+							success = OK;
 					}
 				}
 			}
 		}
 	}
-	
+
 	return success;
-	
+
 }
+
 SUCCESS JsonKeyGen(PJSON_TEST_GROUP groups, int groups_count)
 {
-	SUCCESS success = OK;
-	int i, j;
-	//uint8_t* cur;
-	static uint8_t sk[FIPS205_SK_BYTES], pk[FIPS205_PK_BYTES];
+	SUCCESS success = ERROR, overall = ERROR;
+	int i, j, executed = 0;
 	static uint8_t sk_read[FIPS205_SK_BYTES], pk_read[FIPS205_PK_BYTES];
-	uint8_t PKseed[FIPS205_N]/*, PKroot[FIPS205_N]*/;
+	uint8_t PKseed[FIPS205_N];
 	uint8_t SKseed[FIPS205_N], SKprf[FIPS205_N];
-
 
 	for (i = 0; i < groups_count; ++i)
 	{
-		success = ReadJsonGroupTitle(&groups[i], KEYGEN_TYPE);
-		if (groups[i].parameterSet == FIPS_205_MODE)
+		if (ReadJsonGroupTitle(&groups[i], KEYGEN_TYPE) != OK)
+			continue;
+		if (groups[i].parameterSet != FIPS_205_MODE)
+			continue;
+
 		{
 			int tests = ReadJsonTests(groups[i].tests, groups[i].start, groups[i].finish);
 
 			for (j = 0; j < tests; ++j)
 			{
-				success = ReadJsonKeyGen(sk_read, pk_read, PKseed, SKseed, SKprf, groups[i].tests);
+				/* was groups[i].tests - every pass re-read test 0 */
+				success = ReadJsonKeyGen(sk_read, pk_read, PKseed, SKseed, SKprf,
+							 &groups[i].tests[j]);
 
 				if (success == OK)
 				{
-					uint8_t SKseed[FIPS205_N], SKprf[FIPS205_N],
-						PKseed[FIPS205_N], PKroot_read[FIPS205_N], PKroot[FIPS205_N];
-					memcpy(SKseed, sk_read, FIPS205_N);
-					memcpy(SKprf, sk_read + FIPS205_N, FIPS205_N);
-					memcpy(PKseed, sk_read + 2 * FIPS205_N, FIPS205_N);
-					memcpy(PKroot_read, sk_read + 3 * FIPS205_N, FIPS205_N);
-					//FIPS205_keygen_internal(sk, pk, SKseed, SKprf, PKseed);
-					FIPS205_keygen_internal(PKroot, SKseed, SKprf, PKseed);
-					success = (memcmp(PKroot, PKroot_read, FIPS205_N) != 0);
+					uint8_t PKroot[FIPS205_N];
 
-					printf("%s\tKEYGEN\ttest %d %s\n", smodes[FIPS_205_MODE], groups[i].tests[j].tcId, success == OK ? "OK" : "ERROR");
+					reset_predcalc();
+					FIPS205_keygen_internal(PKroot, SKseed, SKprf, PKseed);
+
+					/* sk = SK.seed||SK.prf||PK.seed||PK.root, pk = PK.seed||PK.root */
+					if (memcmp(sk_read,                     SKseed, FIPS205_N) ||
+					    memcmp(sk_read +     FIPS205_N,     SKprf,  FIPS205_N) ||
+					    memcmp(sk_read + 2 * FIPS205_N,     PKseed, FIPS205_N) ||
+					    memcmp(sk_read + 3 * FIPS205_N,     PKroot, FIPS205_N) ||
+					    memcmp(pk_read,                     PKseed, FIPS205_N) ||
+					    memcmp(pk_read +     FIPS205_N,     PKroot, FIPS205_N))
+						success = ERROR;
+
+					++executed;
+					if (success != OK)
+						overall = ERROR;
+					else if (executed == 1)
+						overall = OK;
 				}
+				else
+					overall = ERROR;
+
+				printf("%s\tKEYGEN\ttest %d %s\n", smodes[FIPS_205_MODE],
+				       groups[i].tests[j].tcId, success == OK ? "OK" : "ERROR");
 			}
 		}
-		//free(m);
 	}
-	return success;
+	return executed ? overall : ERROR;
 
 }
 
@@ -645,175 +798,181 @@ SUCCESS JsonKeyGen(PJSON_TEST_GROUP groups, int groups_count)
 
 
 SUCCESS ReadJsonSigVer(
-	uint8_t* sk, uint8_t* pk, uint8_t* rnd,
-	uint8_t* sig, char* msg, char* err_msg,
-	int* msg_len, PTEST test, size_t max_msg)
+	uint8_t* pk, uint8_t* rnd,
+	uint8_t* sig, int* sig_len, uint8_t* msg,
+	int* msg_len, int* expected, PTEST test, size_t max_msg)
 {
 	SUCCESS success = ERROR;
 	uint8_t* cur = test->start, * cur_end = test->finish;
+	uint8_t* p;
 	int count;
-	cur = ReadJson16CharCount(&count, cur, "\"sk\": ");
-	if (count/2 == FIPS205_SK_BYTES)
-	{
-		cur = ReadJsonHex(sk, cur + 1, count / 2);
-		cur = ReadJson16CharCount(&count, cur, "\"pk\": ");
-		if (count/2 == FIPS205_PK_BYTES)
-		{
-			cur = ReadJsonHex(pk, cur + 1, count / 2);
-			// "additionalRandomness": 
-			cur = ReadJson16CharCount(&count, cur, "\"additionalRandomness\": ");
-			if (count/2 == FIPS205_N)
-			{
-				cur = ReadJsonHex(rnd, cur + 1, count / 2);
-				// "messageLength"
-				cur = ReadJsonInt(msg_len, cur, "\"messageLength\": ");
-				if (*msg_len <= max_msg )
-				{
-					cur = ReadJson16CharCount(&count, cur, "\"message\": ");
-					if (count / 2 == *msg_len / 8)
-					{
-						cur = ReadJsonHex(msg, cur + 1, count / 2);
-						cur = ReadJson16CharCount(&count, cur, "\"signature\": ");
-						if (count / 2 == FIPS205_SIG_BYTES)
-						{
-							cur = ReadJsonHex(sig, cur + 1, count / 2);
-							
-							success = OK;
-						}
 
-					}
-				}
+	*msg_len = 0;
+	*sig_len = 0;
+	*expected = 0;
+
+	/* NIST's verdict for the case; the stale "reason" strings are not used */
+	if (ReadJsonBool(expected, test->start, cur_end, "\"testPassed\"") == 0)
+		return ERROR;
+
+	cur = ReadJson16CharCount(&count, cur, cur_end, "\"pk\"");
+	if (cur && count / 2 == FIPS205_PK_BYTES)
+	{
+		cur = ReadJsonHex(pk, cur + 1, count / 2);
+
+		p = ReadJson16CharCount(&count, test->start, cur_end, "\"additionalRandomness\"");
+		if (p != 0 && count / 2 == FIPS205_N)
+			ReadJsonHex(rnd, p + 1, count / 2);
+
+		cur = ReadJson16CharCount(&count, cur, cur_end, "\"message\"");
+		if (cur && (size_t)(count / 2) * 8 <= max_msg)
+		{
+			*msg_len = (count / 2) * 8;
+			cur = ReadJsonHex(msg, cur + 1, count / 2);
+
+			/*
+			 * Negative vectors deliberately carry a signature one byte
+			 * shorter or longer than FIPS205_SIG_BYTES, so the length is
+			 * read rather than assumed.
+			 */
+			cur = ReadJson16CharCount(&count, cur, cur_end, "\"signature\"");
+			if (cur && count / 2 <= FIPS205_SIG_BYTES + 4)
+			{
+				*sig_len = count / 2;
+				cur = ReadJsonHex(sig, cur + 1, count / 2);
+				if (cur)
+					success = OK;
 			}
 		}
 	}
-	cur = ReadJsonChar(err_msg, cur, "\"reason\": ");
 	return success;
 }
-					
+
 SUCCESS JsonSigVer(PJSON_TEST_GROUP groups, int groups_count)
 {
-	SUCCESS success = OK;
-	int i, j;
-	//uint8_t* cur;
-	static uint8_t sk[FIPS205_SK_BYTES], pk[FIPS205_PK_BYTES], sig [FIPS205_SIG_BYTES];
+	SUCCESS success = ERROR, overall = ERROR;
+	int i, j, executed = 0;
+	static uint8_t pk[FIPS205_PK_BYTES], sig [FIPS205_SIG_BYTES + 4];
 	static uint8_t rnd[FIPS205_N];
 
-	static uint8_t additionalRandomness[FIPS205_N];
-
 	uint8_t* m;
-	int m_len/*, sig_len*/;
-	//uint8_t* m;
-	char* err_msgs[] = {
-		"valid signature and message - signature should verify successfully",
-		"modified signature - SIGFORS modified",
-		"invalid signature - signature is too large",
-		"modified signature - SIGHT modified",
-		"modified signature - R modified",
-		"invalid signature - signature is too small",
-		"message altered",
-		"modified signature - SIGHT modified"
-	}, err_msg [256];
+	int m_len, sig_len, expected;
+
 	for (i = 0; i < groups_count; ++i)
 	{
-		
-		/*if (m)
-		{*/
-			//cur = groups[i].start;
-		success = ReadJsonGroupTitle(&groups[i], SIGVER_TYPE);
-		if (groups[i].parameterSet == FIPS_205_MODE)
-		{
-			size_t max_msg_value = (size_t)groups[i].jtml.max;
-			m = malloc(groups[i].jtml.max/8);
-			if (m)
-			{
-				int tests = ReadJsonTests(groups[i].tests, groups[i].start, groups[i].finish);
-				
-				for (j = 0; j < tests; ++j)
-				{
-					success = ReadJsonSigVer(sk, pk, rnd, sig, m, err_msg, &m_len, &groups[i].tests[j], max_msg_value);
-					
-					if (success == OK)
-						success = FIPS205_verify_internal(m, m_len/8, sig, FIPS205_SIG_BYTES, pk);
-					if ((success == ERROR) && strcmp(err_msg, err_msgs[0]))
-						success = OK;
-					printf("%s\tSIGVER\ttest %d %s\n", smodes[FIPS_205_MODE], groups[i].tests[j].tcId, success == OK ? "OK" : "ERROR");
-				}
-				free(m);
-			}
-			//free(m);
-		}
+		if (ReadJsonGroupTitle(&groups[i], SIGVER_TYPE) != OK)
+			continue;
+		if (groups[i].parameterSet != FIPS_205_MODE)
+			continue;
+		if (strcmp(groups[i].preHash, "none") != 0)
+			continue;                       /* external / pre-hash group */
 
+		m = malloc(groups[i].jtml.max / 8);
+		if (m)
+		{
+			int tests = ReadJsonTests(groups[i].tests, groups[i].start, groups[i].finish);
+
+			for (j = 0; j < tests; ++j)
+			{
+				success = ReadJsonSigVer(pk, rnd, sig, &sig_len, m, &m_len, &expected,
+							 &groups[i].tests[j], (size_t)groups[i].jtml.max);
+
+				if (success == OK)
+				{
+					SUCCESS res;
+
+					reset_predcalc();
+					res = FIPS205_verify_internal_new__(m, m_len / 8, sig,
+								      (uint32_t)sig_len, pk);
+
+					/* the case passes when our verdict matches testPassed */
+					success = ((res == OK) == (expected != 0)) ? OK : ERROR;
+
+					++executed;
+					if (success != OK)
+						overall = ERROR;
+					else if (executed == 1)
+						overall = OK;
+				}
+				else
+					overall = ERROR;
+
+				printf("%s\tSIGVER\ttest %d %s\n", smodes[FIPS_205_MODE],
+				       groups[i].tests[j].tcId, success == OK ? "OK" : "ERROR");
+			}
+			free(m);
+		}
 	}
-	return success;
+	return executed ? overall : ERROR;
 }
 
-SUCCESS TestJsonFile(/*PJSON  json_datas, */const char* fn)
+SUCCESS TestJsonFile(const char* fn)
 {
-	
+
 	SUCCESS success = ERROR;
-	size_t fsize;
+	size_t fsize = 0;
 	static JSON  datas, * json_datas = &datas;
-		
-	uint8_t*p =  ReadJsonFile(&fsize, fn);
-	uint8_t* cur = p, *cur_max = cur + fsize;
-	size_t st_cur = (size_t)cur, st_cur_max = st_cur + fsize;
-	if (p)
+	PJSON_TEST_GROUP garr;
+	uint8_t* p;
+	uint8_t* cur;
+	uint8_t* cur_max;
+
+	p = ReadJsonFile(&fsize, fn);
+	if (p == 0 || fsize == 0)
 	{
+		free(p);
+		return ERROR;
+	}
 
-		//uint8_t temp[32];
-		//uint8_t* cur = p;
-		cur = ReadJsonTitle(json_datas, cur);
-		if (cur && (size_t) cur < st_cur_max)
+	cur = p;
+	cur_max = p + fsize;
+
+	/*
+	 * JSON.groups[30] in FIPS_205_JSon.h is smaller than the 72 groups the
+	 * current sigGen file carries, so the array is allocated here instead.
+	 */
+	garr = (PJSON_TEST_GROUP)malloc(128 * sizeof(JSON_TEST_GROUP));
+	if (garr == 0)
+	{
+		free(p);
+		return ERROR;
+	}
+	groups_capacity = 128;
+
+	cur = ReadJsonTitle(json_datas, cur, cur_max);
+	if (cur && cur < cur_max)
+	{
+		cur = ReadJsonLabel(cur, cur_max, "\"testGroups\"", '[');
+		if (cur && cur < cur_max)
 		{
-			cur = ReadJsonLabel(cur, "\"testGroups\": ", '[');
-			int groups_count;
-			if ((size_t)cur < st_cur_max)
+			int groups_count = ReadGroups(garr, cur);
+			json_datas->groups_count = groups_count;
+
+			if (json_datas->Mode == KEYGEN_TYPE)
 			{
-				groups_count = ReadGroups(json_datas->groups, cur);
-				json_datas->groups_count = groups_count;
-				//int i, j, tests_count;
-
-				
-
-				//int value;
-				if (json_datas->Mode == KEYGEN_TYPE)
+				success = JsonKeyGen(garr, groups_count);
+			}
+			else
+			{
+				if (json_datas->Mode == SIGGEN_TYPE)
 				{
-					success = JsonKeyGen(json_datas->groups, groups_count);
-		
+					success = JsonSigGen(garr, groups_count);
 				}
 				else
 				{
-					if (json_datas->Mode == SIGGEN_TYPE)
+					if (json_datas->Mode == SIGVER_TYPE)
 					{
-						success = JsonSigGen(json_datas->groups, groups_count);
-
+						success = JsonSigVer(garr, groups_count);
 					}
-					else
-					{
-						if (json_datas->Mode == SIGVER_TYPE)
-						{
-							
-							success = JsonSigVer(json_datas->groups, groups_count);
-							
-						}
-						
-					}
-
-
 				}
-
 			}
-			
-				
-		
-
 		}
-		free(p);
-		
 	}
-		
-	//success = OK;
-	
+
+	groups_capacity = 0;
+	free(garr);
+	free(p);
+
 	return success;
 }
 
@@ -821,26 +980,17 @@ SUCCESS TestJsonFile(/*PJSON  json_datas, */const char* fn)
 SUCCESS TestJSon()
 {
 
-	
 	SUCCESS success = OK;
 
-	success = TestJsonFile(KEYGEN_FILE);
+	/* all three files are run even if an earlier one fails */
+	if (TestJsonFile(KEYGEN_FILE) != OK)
+		success = ERROR;
 
+	if (TestJsonFile(SIGGEN_FILE) != OK)
+		success = ERROR;
 
-
-	if (success == OK)
-	{
-		success = TestJsonFile(SIGGEN_FILE);
-
-	}
-
-
-	if (success == OK)
-	{
-		success = TestJsonFile(SIGVER_FILE);
-
-	}
-
+	if (TestJsonFile(SIGVER_FILE) != OK)
+		success = ERROR;
 
 	return success;
 

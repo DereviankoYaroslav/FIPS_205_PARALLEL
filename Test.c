@@ -4687,7 +4687,7 @@ int test_internal_function()
                 if (tacts < min_tacts)
                     min_tacts = tacts;
             }
-            printf("crypto_sign_seed_keypair (Autor) time- %I64d\n", min_tacts);
+            printf("crypto_sign_seed_keypair (autor) time- %I64d\n", min_tacts);
 #endif
 
         
@@ -4910,7 +4910,7 @@ int test_internal_function()
             min_tacts = tacts;
 
     }
-    printf("crypto_sign_verify tacts = %I64d\n", min_tacts);
+    printf("crypto_sign_verify (autor) tacts = %I64d\n", min_tacts);
 
 #endif
 

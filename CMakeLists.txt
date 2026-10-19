@@ -6,7 +6,7 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
 # Compiler flags for AVX/SHA/etc
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -march=native -mtune=native -mavx2 -fopenmp -mfma -funroll-loops -finline-functions -ffast-math -fcommon -fno-lto")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -mtune=native -mavx2 -msha -fopenmp -mfma -funroll-loops -finline-functions -fcommon")
 
 # Include directories
 include_directories(
@@ -66,4 +66,4 @@ add_executable(Test ${SOURCES})
 
 # Link math library
 target_link_libraries(Test m)
-target_compile_definitions(Test PRIVATE _PREDCALC _JSON_FILE_)
+target_compile_definitions(Test PRIVATE _PREDCALC _JSON_FILE)

@@ -1,20 +1,27 @@
 #include <stdio.h>
+
+#include "SHA256_device.h"
+
 #if defined(_MSC_VER)
 #include <intrin.h>
 #else
 #include <x86intrin.h>
 #endif
 
+#include "Common.h"
 #include "FIPS_205_Params.h"
 #include "FIPS_205_Adr.h"
 #include "FIPS_205_Test.h"
 #include "AVXconst.h"
+#include "FIPS_205_JSon.h"
 
 int main()
 {
 	print_params();
 	int res = 0;
 
+	printf("\nCPU SHA-NI (SHA-1/SHA-256) instructions:  %s\n", check_sha256() ? "Available" : "Not available");
+	printf("CPU SHA-512 instructions:  %s\n\n", is_sha512_usable() ? "Available" : "Not available");
 
 	SetAVXConst();
 #ifdef _JSON_FILE
