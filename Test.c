@@ -1,4 +1,5 @@
 ﻿#include <stdio.h>
+#include <inttypes.h>
 #if defined(_MSC_VER)
 #include <intrin.h>
 #else
@@ -377,7 +378,7 @@ int test_AVX_HMAC()
 ////        if (tacts < min_tacts)
 ////            min_tacts = tacts;
 ////    }
-////    printf("AVX_SHA256_WITH_PREDCALC8 time = %I64d\n", min_tacts);
+////    printf("AVX_SHA256_WITH_PREDCALC8 time = %" PRIu64 "\n", min_tacts);
 ////#endif
 ////
 ////
@@ -455,7 +456,7 @@ int test_AVX_HMAC()
 ////        if (tacts < min_tacts)
 ////            min_tacts = tacts;
 ////    }
-////    printf("thashx8 time = %I64d\n", min_tacts);
+////    printf("thashx8 time = %" PRIu64 "\n", min_tacts);
 ////#endif
 //    return res;
 //}
@@ -959,7 +960,7 @@ int test_AVX_sha512_WITH_PREDCALC4()
         if (tacts < min_tacts)
             min_tacts = tacts;
     }
-    printf("AVX_sha512_WITH_PREDCALC time = %I64d\n", min_tacts);
+    printf("AVX_sha512_WITH_PREDCALC time = %" PRIu64 "\n", min_tacts);
 #endif
 #ifndef _DEBUG
     min_tacts = 0xFFFFFFFFFFFFFFFF;
@@ -973,7 +974,7 @@ int test_AVX_sha512_WITH_PREDCALC4()
         if (tacts < min_tacts)
             min_tacts = tacts;
     }
-    printf("AVX_sha512_WITH_PREDCALC4 time = %I64d\n", min_tacts);
+    printf("AVX_sha512_WITH_PREDCALC4 time = %" PRIu64 "\n", min_tacts);
 #endif
     res = memcmp(h1, h2, sizeof(h1));
     return res;
@@ -1020,7 +1021,7 @@ int test_AVX_F()
         if (min_tacts > tacts)
             min_tacts = tacts;
     }
-    printf("AVX_F time = %I64d\n", min_tacts);
+    printf("AVX_F time = %" PRIu64 "\n", min_tacts);
 
 #endif
 
@@ -1057,7 +1058,7 @@ int test_AVX_F()
         if (min_tacts > tacts)
             min_tacts = tacts;
     }
-    printf("thashx8 time = %I64d\n", min_tacts);
+    printf("thashx8 time = %" PRIu64 "\n", min_tacts);
 
 #endif
 
@@ -1140,7 +1141,7 @@ int test_AVX_HMsg()
         if (tacts < min_tacts)
             min_tacts = tacts;
     }
-    printf("HMsg time = %I64d\n", min_tacts);
+    printf("HMsg time = %" PRIu64 "\n", min_tacts);
 #endif
 
 #ifndef _DEBUG
@@ -1156,7 +1157,7 @@ int test_AVX_HMsg()
     if (tacts < min_tacts)
         min_tacts = tacts;
 }
-    printf("AVX_HMsg time = %I64d\n", min_tacts);
+    printf("AVX_HMsg time = %" PRIu64 "\n", min_tacts);
 #endif
     int res = 0;
     for (int i = 0; i < FIPS205_M; ++i)
@@ -1206,7 +1207,7 @@ int test_AVX_PRFmsg ()
         if (tacts < min_tacts)
             min_tacts = tacts;
     }
-    printf("PRFmsg time = %I64d\n", min_tacts);
+    printf("PRFmsg time = %" PRIu64 "\n", min_tacts);
 #endif
 #endif
     int res = 0;
@@ -1226,7 +1227,7 @@ int test_AVX_PRFmsg ()
     if (tacts < min_tacts)
         min_tacts = tacts;
     }
-    printf("AVX_PRFmsg time = %I64d\n", min_tacts);
+    printf("AVX_PRFmsg time = %" PRIu64 "\n", min_tacts);
 #endif
 #if FIPS205_N == 16
     //if (res == 0)
@@ -1314,7 +1315,7 @@ int test_Tl()
     if (tacts < min_tacts)
         min_tacts = tacts;
 }
-    printf("Tl (%d) time = %I64d\n ", FIPS205_LEN, min_tacts);
+    printf("Tl (%d) time = %" PRIu64 "\n", FIPS205_LEN, min_tacts);
 #endif
 
 #if FIPS205_N == 16
@@ -1341,7 +1342,7 @@ int test_Tl()
     if (tacts < min_tacts)
         min_tacts = tacts;
 }
-    printf("AVX_Tl (%d) time = %I64d\n ", FIPS205_LEN, min_tacts);
+    printf("AVX_Tl (%d) time = %" PRIu64 "\n", FIPS205_LEN, min_tacts);
 #endif
     int res = 0;
     
@@ -1366,7 +1367,7 @@ int test_Tl()
         if (tacts < min_tacts)
             min_tacts = tacts;
     }
-        printf("Tl (%d) time = %I64d\n ", FIPS205_K, min_tacts);
+        printf("Tl (%d) time = %" PRIu64 "\n", FIPS205_K, min_tacts);
 #endif
 #ifndef _DEBUG
         min_tacts = 0xFFFFFFFFFFFFFFFF;
@@ -1381,7 +1382,7 @@ int test_Tl()
         if (tacts < min_tacts)
             min_tacts = tacts;
     }
-        printf("AVX_Tl (%d) time = %I64d\n ", FIPS205_K, min_tacts);
+        printf("AVX_Tl (%d) time = %" PRIu64 "\n", FIPS205_K, min_tacts);
 #endif
         for (int i = 0; i < FIPS205_N; ++i)
         {
@@ -1456,7 +1457,7 @@ int test_AVX_PREDCALC_W_sha()
         if (tacts < min_tacts)
             min_tacts = tacts;
     }
-    printf("time sha512 = %I64d\n", min_tacts);
+    printf("time sha512 = %" PRIu64 "\n", min_tacts);
 
     //int res = 0;
 #endif
@@ -1474,7 +1475,7 @@ int test_AVX_PREDCALC_W_sha()
     if (tacts < min_tacts)
         min_tacts = tacts;
 }
-    printf("AVX_PREDCALC_sha512 = %I64d\n", min_tacts);
+    printf("AVX_PREDCALC_sha512 = %" PRIu64 "\n", min_tacts);
 
 #endif
 
@@ -1503,7 +1504,7 @@ int test_AVX_PREDCALC_W_sha()
     if (tacts < min_tacts)
         min_tacts = tacts;
 }
-    printf("AVX_PREDCALC_W_sha512_ = %I64d\n", min_tacts);
+    printf("AVX_PREDCALC_W_sha512_ = %" PRIu64 "\n", min_tacts);
 #endif
 
     res = 0;
@@ -2066,7 +2067,7 @@ int test_FIPS205_wots()
             if (tacts < min_tacts)
                 min_tacts = tacts;
         }
-        printf("wots_gen_pk_avtors = %I64d\n", min_tacts);
+        printf("wots_gen_pk_avtors = %" PRIu64 "\n", min_tacts);
 #endif
 
         
@@ -2633,7 +2634,7 @@ int test_FIPS205_xmss()
         if (tacts < min_tacts)
             min_tacts = tacts;
     }
-    printf("FIPS205_AVX_xmss_node__OLD (Open MP)time- %I64d\n", min_tacts);
+    printf("FIPS205_AVX_xmss_node__OLD (Open MP)time = %" PRIu64 "\n", min_tacts);
 #endif
 
 #ifndef _DEBUG
@@ -2667,7 +2668,7 @@ int test_FIPS205_xmss()
         if (tacts < min_tacts)
             min_tacts = tacts;
     }
-    printf("FIPS205_AVX_xmss_node (AVX) time- %I64d\n", min_tacts);
+    printf("FIPS205_AVX_xmss_node (AVX) time = %" PRIu64 "\n", min_tacts);
 #endif
     for (i = 0; i < FIPS205_N; ++i)
     {
@@ -2708,7 +2709,7 @@ int test_FIPS205_xmss()
         if (tacts < min_tacts)
             min_tacts = tacts;
     }
-    printf("FIPS205_AVX_xmss_node__ (AVX) time- %I64d\n", min_tacts);
+    printf("FIPS205_AVX_xmss_node__ (AVX) time = %" PRIu64 "\n", min_tacts);
 #endif
     for (i = 0; i < FIPS205_N; ++i)
     {
@@ -2745,7 +2746,7 @@ int test_FIPS205_xmss()
             if (tacts < min_tacts)
                 min_tacts = tacts;
         }
-        printf("crypto_sign_seed_keypair (Autor) time- %I64d\n", min_tacts);
+        printf("crypto_sign_seed_keypair (Autor) time = %" PRIu64 "\n", min_tacts);
 #endif
         
     }
@@ -2775,7 +2776,7 @@ int test_FIPS205_xmss()
         if (tacts < min_tacts)
             min_tacts = tacts;
     }
-    printf("xmss_sign__OLD time- %I64d\n", min_tacts);
+    printf("xmss_sign__OLD time = %" PRIu64 "\n", min_tacts);
 #endif
 
 #ifndef _DEBUG
@@ -2803,7 +2804,7 @@ int test_FIPS205_xmss()
         if (tacts < min_tacts)
             min_tacts = tacts;
     }
-    printf("FIPS205_AVX_xmss_sign time = %I64d\n", min_tacts);
+    printf("FIPS205_AVX_xmss_sign time = %" PRIu64 "\n", min_tacts);
 #endif
     res = 0;
     for (i = 0; i < sizeof(SIGtmp2); ++i)
@@ -2839,7 +2840,7 @@ int test_FIPS205_xmss()
         if (tacts < min_tacts)
             min_tacts = tacts;
     }
-    printf("FIPS205_AVX_xmss_sign_ time = %I64d\n", min_tacts);
+    printf("FIPS205_AVX_xmss_sign_ time = %" PRIu64 "\n", min_tacts);
 #endif
     res = 0;
     for (i = 0; i < sizeof(SIGtmp2); ++i)
@@ -2891,7 +2892,7 @@ int test_FIPS205_xmss()
         if (tacts < min_tacts)
             min_tacts = tacts;
     }
-    printf("xmss_pkFromSig  (Open MP) time- %I64d\n", min_tacts);
+    printf("xmss_pkFromSig  (Open MP) time = %" PRIu64 "\n", min_tacts);
 #endif
 
 #ifndef _DEBUG
@@ -2934,7 +2935,7 @@ int test_FIPS205_xmss()
         if (tacts < min_tacts)
             min_tacts = tacts;
     }
-    printf("FIPS205_AVX_xmss_pkFromSig time = %I64d\n", min_tacts);
+    printf("FIPS205_AVX_xmss_pkFromSig time = %" PRIu64 "\n", min_tacts);
 #endif
     res = 0;
     for (i = 0; i < FIPS205_N; ++i)
@@ -3119,7 +3120,7 @@ int test_FIPS205_xmss()
 //        if (tacts < mintacts)
 //            mintacts = tacts;
 //    }
-//    printf("FIPS_ht_sign__END time = %I64d\n", mintacts);
+//    printf("FIPS_ht_sign__END time = %" PRIu64 "\n", mintacts);
 //
 //
 //#endif
@@ -3142,7 +3143,7 @@ int test_FIPS205_xmss()
 //        if (tacts < mintacts)
 //            mintacts = tacts;
 //    }
-//    printf("FIPS_AVX_ht_sign time = %I64d\n", mintacts);
+//    printf("FIPS_AVX_ht_sign time = %" PRIu64 "\n", mintacts);
 //
 //
 //#endif
@@ -3171,7 +3172,7 @@ int test_FIPS205_xmss()
 //		if (tacts < mintacts)
 //			mintacts = tacts;
 //	}
-//	printf("ht_verify__OLD (Open MP) time = %I64d\n", mintacts);
+//	printf("ht_verify__OLD (Open MP) time = %" PRIu64 "\n", mintacts);
 //
 //#endif
 //
@@ -3194,7 +3195,7 @@ int test_FIPS205_xmss()
 //		if (tacts < mintacts)
 //			mintacts = tacts;
 //	}
-//	printf("FIPS205_AVX_ht_verify time = %I64d\n", mintacts);
+//	printf("FIPS205_AVX_ht_verify time = %" PRIu64 "\n", mintacts);
 //#endif
 //
 //
@@ -3331,7 +3332,7 @@ int test_FIPS205_fors_and_HT()
 		if (tacts < min_tacts)
             min_tacts = tacts;
 	}
-	printf("fors_skGen (Open MP) time = %I64d\n", min_tacts);
+	printf("fors_skGen (Open MP) time = %" PRIu64 "\n", min_tacts);
 #endif
 #ifndef _DEBUG
     min_tacts = 0xFFFFFFFFFFFFFFFF;
@@ -3358,7 +3359,7 @@ int test_FIPS205_fors_and_HT()
 		if (tacts < min_tacts)
             min_tacts = tacts;
 	}
-	printf("FIPS205_AVX_fors_sk time = %I64d\n", min_tacts);
+	printf("FIPS205_AVX_fors_sk time = %" PRIu64 "\n", min_tacts);
 #endif
     res = 0;
     for (i = 0; i < FIPS205_K; ++i)
@@ -3386,7 +3387,7 @@ int test_FIPS205_fors_and_HT()
 		if (tacts < min_tacts)
             min_tacts = tacts;
 	}
-	printf("fors_node (Open MP) time = %I64d\n", min_tacts);
+	printf("fors_node (Open MP) time = %" PRIu64 "\n", min_tacts);
 #endif
 #ifndef _DEBUG
     min_tacts = 0xFFFFFFFFFFFFFF;
@@ -3413,7 +3414,7 @@ int test_FIPS205_fors_and_HT()
 		if (tacts < min_tacts)
             min_tacts = tacts;
 	}
-	printf("FIPS205_AVX_fors_node time = %I64d\n", min_tacts);
+	printf("FIPS205_AVX_fors_node time = %" PRIu64 "\n", min_tacts);
 #endif
 	
 	/*
@@ -3454,7 +3455,7 @@ int test_FIPS205_fors_and_HT()
             min_tacts = tacts;
 		//printf("fors_sign %x %x\n", fors_sign1[0], fors_sign1[1]);
 	}
-	printf("fors_sign__OLD: tacts = %I64d\n", min_tacts);
+	printf("fors_sign__OLD: tacts = %" PRIu64 "\n", min_tacts);
 #endif
 #ifndef _DEBUG
     min_tacts = 0xFFFFFFFFFFFFFFFF;
@@ -3491,7 +3492,7 @@ int test_FIPS205_fors_and_HT()
             min_tacts = tacts;
 		//printf("fors_sign_ %x %x\n", fors_sign2[0], fors_sign2[1]);
 	}
-	printf("fors_sign_: tacts = %I64d\n", min_tacts);
+	printf("fors_sign_: tacts = %" PRIu64 "\n", min_tacts);
 #endif
 	
 	res = 0;
@@ -3570,7 +3571,7 @@ int test_FIPS205_fors_and_HT()
             min_tacts = tacts;
         //printf("fors_sign_ %x %x\n", fors_sign2[0], fors_sign2[1]);
     }
-    printf("FIPS205_AVX_fors_sign__: tacts = %I64d\n", min_tacts);
+    printf("FIPS205_AVX_fors_sign__: tacts = %" PRIu64 "\n", min_tacts);
 #endif
     res = 0;
     if (p1 - fors_sign1 != p2 - fors_sign2)
@@ -3624,7 +3625,7 @@ int test_FIPS205_fors_and_HT()
             min_tacts = tacts;
         //printf("fors_sign_ %x %x\n", fors_sign2[0], fors_sign2[1]);
     }
-    printf("FIPS205_AVX_fors_sign: tacts = %I64d\n", min_tacts);
+    printf("FIPS205_AVX_fors_sign: tacts = %" PRIu64 "\n", min_tacts);
 #endif
 
     res = 0;
@@ -3687,7 +3688,7 @@ int test_FIPS205_fors_and_HT()
             min_tacts = tacts;
         //printf("fors_sign_ %x %x\n", fors_sign2[0], fors_sign2[1]);
     }
-    printf("FIPS205_AVX_fors_sign_new: tacts = %I64d\n", min_tacts);
+    printf("FIPS205_AVX_fors_sign_new: tacts = %" PRIu64 "\n", min_tacts);
 #endif
 
     res = 0;
@@ -3758,7 +3759,7 @@ int test_FIPS205_fors_and_HT()
             min_tacts = tacts;
         //printf("fors_sign_ %x %x\n", fors_sign2[0], fors_sign2[1]);
     }
-    printf("FIPS205_AVX_fors_sign_new__: tacts = %I64d\n", min_tacts);
+    printf("FIPS205_AVX_fors_sign_new__: tacts = %" PRIu64 "\n", min_tacts);
 #endif
 
     res = 0;
@@ -3834,7 +3835,7 @@ int test_FIPS205_fors_and_HT()
             min_tacts = tacts;
 		//printf("fors_sign_ %x %x\n", fors_sign2[0], fors_sign2[1]);
 	}
-	printf("fors_sign__: tacts = %I64d\n", min_tacts);
+	printf("fors_sign__: tacts = %" PRIu64 "\n", min_tacts);
 #endif
 
 	res = 0;
@@ -3875,7 +3876,7 @@ int test_FIPS205_fors_and_HT()
                 min_tacts = tacts;
             //printf("fors_sign_ %x %x\n", fors_sign2[0], fors_sign2[1]);
         }
-        printf("fors_sign (author): tacts = %I64d\n", min_tacts);
+        printf("fors_sign (author): tacts = %" PRIu64 "\n", min_tacts);
 
 #endif
         uint8_t pk_autor[FIPS205_N];
@@ -3901,7 +3902,7 @@ int test_FIPS205_fors_and_HT()
                 min_tacts = tacts;
             //printf("fors_sign_ %x %x\n", fors_sign2[0], fors_sign2[1]);
         }
-        printf("fors_pk_from_sig (author): tacts = %I64d\n", min_tacts);
+        printf("fors_pk_from_sig (author): tacts = %" PRIu64 "\n", min_tacts);
 
 #endif
 
@@ -3939,7 +3940,7 @@ int test_FIPS205_fors_and_HT()
                 min_tacts = tacts;
 			//printf("fors_pkFromSig: %x %x\n", PK_fors1[0], PK_fors1[1]);
 	}
-	printf("fors_pkFromSig tacts = %I64d\n", min_tacts);
+	printf("fors_pkFromSig tacts = %" PRIu64 "\n", min_tacts);
 #endif
 
 
@@ -3981,7 +3982,7 @@ int test_FIPS205_fors_and_HT()
                 min_tacts = tacts;
 			//printf("fors_pkFromSig_ %x %x\n", PK_fors2[0], PK_fors2[1]);
 		}
-		printf("fors_pkFromSig_ tacts = %I64d\n", min_tacts);
+		printf("fors_pkFromSig_ tacts = %" PRIu64 "\n", min_tacts);
 #endif
 		res = memcmp(PK_fors1, PK_fors2, FIPS205_N);
 		printf("fors_pkFromSig and fors_pkFromSig_: %s\n", res == 0 ? "OK" : "ERROR");
@@ -4017,7 +4018,7 @@ int test_FIPS205_fors_and_HT()
                 min_tacts = tacts;
 			//printf("fors_pkFromSig_ %x %x\n", PK_fors2[0], PK_fors2[1]);
 		}
-		printf("fors_pkFromSig__ (Open MP) tacts = %I64d\n", min_tacts);
+		printf("fors_pkFromSig__ (Open MP) tacts = %" PRIu64 "\n", min_tacts);
 #endif
 
 		res = memcmp(PK_fors1, PK_fors2, FIPS205_N);
@@ -4066,7 +4067,7 @@ int test_FIPS205_fors_and_HT()
                 min_tacts = tacts;
             //printf("fors_pkFromSig_ %x %x\n", PK_fors2[0], PK_fors2[1]);
         }
-        printf("FIPS205_AVX_fors_pkFromSig tacts = %I64d\n", min_tacts);
+        printf("FIPS205_AVX_fors_pkFromSig tacts = %" PRIu64 "\n", min_tacts);
 #endif
 
         res = memcmp(PK_fors1, PK_fors2, FIPS205_N);
@@ -4129,7 +4130,7 @@ int test_FIPS205_fors_and_HT()
                 min_tacts = tacts;
             //printf("fors_pkFromSig_ %x %x\n", PK_fors2[0], PK_fors2[1]);
         }
-        printf("FIPS205_AVX_fors_pkFromSig_new__ tacts = %I64d\n", min_tacts);
+        printf("FIPS205_AVX_fors_pkFromSig_new__ tacts = %" PRIu64 "\n", min_tacts);
 #endif
 
         res = memcmp(PK_fors1, PK_fors2, FIPS205_N);
@@ -4193,7 +4194,7 @@ uint8_t* FIPS205_AVX_fors_sign_and_PK(
 //                min_tacts = tacts;
 //            
 //        }
-//        printf("FIPS205_AVX_fors_sign_and_PK tacts = %I64d\n", min_tacts);
+//        printf("FIPS205_AVX_fors_sign_and_PK tacts = %" PRIu64 "\n" min_tacts);
 //#endif
 //
 //        res = memcmp(fors_sign1, fors_sign2, FIPS205_K * (FIPS205_A + 1) * FIPS205_N);
@@ -4269,7 +4270,7 @@ uint8_t* FIPS205_AVX_fors_sign_and_PK(
             if (tacts < min_tacts)
                 min_tacts = tacts;
         }
-        printf("FIPS_ht_sign__END time = %I64d\n", min_tacts);
+        printf("FIPS_ht_sign__END time = %" PRIu64 "\n", min_tacts);
 
 
 #endif
@@ -4299,7 +4300,7 @@ uint8_t* FIPS205_AVX_fors_sign_and_PK(
             if (tacts < min_tacts)
                 min_tacts = tacts;
         }
-        printf("FIPS_AVX_ht_sign time = %I64d\n", min_tacts);
+        printf("FIPS_AVX_ht_sign time = %" PRIu64 "\n", min_tacts);
 
 
 #endif
@@ -4343,7 +4344,7 @@ uint8_t* FIPS205_AVX_fors_sign_and_PK(
                 if (tacts < min_tacts)
                     min_tacts = tacts;
             }
-            printf("ht_signature (autor) time = %I64d\n", min_tacts);
+            printf("ht_signature (autor) time = %" PRIu64 "\n", min_tacts);
 
 
 #endif
@@ -4370,7 +4371,7 @@ uint8_t* FIPS205_AVX_fors_sign_and_PK(
             if (tacts < min_tacts)
                 min_tacts = tacts;
         }
-        printf("ht_verify__OLD (Open MP) time = %I64d\n", min_tacts);
+        printf("ht_verify__OLD (Open MP) time = %" PRIu64 "\n", min_tacts);
 
 #endif
 
@@ -4400,7 +4401,7 @@ uint8_t* FIPS205_AVX_fors_sign_and_PK(
             if (tacts < min_tacts)
                 min_tacts = tacts;
         }
-        printf("FIPS205_AVX_ht_verify time = %I64d\n", min_tacts);
+        printf("FIPS205_AVX_ht_verify time = %" PRIu64 "\n", min_tacts);
 #endif
 
 
@@ -4454,7 +4455,7 @@ uint8_t* FIPS205_AVX_fors_sign_and_PK(
                 if (tacts < min_tacts)
                     min_tacts = tacts;
             }
-            printf("ht_verify (autor) time = %I64d\n", min_tacts);
+            printf("ht_verify (autor) time = %" PRIu64 "\n", min_tacts);
 #endif
 
 
@@ -4519,7 +4520,7 @@ uint8_t* FIPS205_AVX_fors_sign_and_pk(
 //            if (tacts < min_tacts)
 //                min_tacts = tacts;
 //        }
-//        printf("FIPS205_AVX_fors_sign_and_pk tacts = %I64d\n", min_tacts);
+//        printf("FIPS205_AVX_fors_sign_and_pk tacts = %" PRIu64 "\n", min_tacts);
 //#endif
 //        
 //        //res = memcmp(PK_fors1, PK_fors2, FIPS205_N);
@@ -4627,7 +4628,7 @@ int test_internal_function()
     //printf("fors_pkFromSig_ %x %x\n", PK_fors2[0], PK_fors2[1]);
 }
     
-    printf("slh_keygen_internal__OLD tacts = %I64d\n", min_tacts);
+    printf("slh_keygen_internal__OLD tacts = %" PRIu64 "\n", min_tacts);
 #endif
     
 #ifndef _DEBUG
@@ -4646,7 +4647,7 @@ int test_internal_function()
         min_tacts = tacts;
     //printf("fors_pkFromSig_ %x %x\n", PK_fors2[0], PK_fors2[1]);
 }
-    printf("FIPS205_keygen_internal tacts = %I64d\n", min_tacts);
+    printf("FIPS205_keygen_internal tacts = %" PRIu64 "\n", min_tacts);
 #endif
 
     for (i = 0; i < FIPS205_N; ++i)
@@ -4687,7 +4688,7 @@ int test_internal_function()
                 if (tacts < min_tacts)
                     min_tacts = tacts;
             }
-            printf("crypto_sign_seed_keypair (autor) time- %I64d\n", min_tacts);
+            printf("crypto_sign_seed_keypair (autor) time = %" PRIu64 "\n", min_tacts);
 #endif
 
         
@@ -4717,7 +4718,7 @@ int test_internal_function()
             min_tacts = tacts;
         //printf("fors_pkFromSig_ %x %x\n", PK_fors2[0], PK_fors2[1]);
     }
-    printf("slh_sign_internal__OLD tacts = %I64d\n", min_tacts);
+    printf("slh_sign_internal__OLD tacts = %" PRIu64 "\n", min_tacts);
 #endif
 
     //printf("sign1\n");
@@ -4744,7 +4745,7 @@ int test_internal_function()
             min_tacts = tacts;
         //printf("fors_pkFromSig_ %x %x\n", PK_fors2[0], PK_fors2[1]);
     }
-    printf("FIPS205_sign_internal tacts = %I64d\n", min_tacts);
+    printf("FIPS205_sign_internal tacts = %" PRIu64 "\n", min_tacts);
 #endif
 
     //printf("sign2 after FIPS205_sign_internal\n");
@@ -4778,7 +4779,7 @@ int test_internal_function()
             min_tacts = tacts;
         //printf("fors_pkFromSig_ %x %x\n", PK_fors2[0], PK_fors2[1]);
     }
-    printf("FIPS205_sign_internal_new__ tacts = %I64d\n", min_tacts);
+    printf("FIPS205_sign_internal_new__ tacts = %" PRIu64 "\n", min_tacts);
 #endif
     res = 0;
 
@@ -4821,7 +4822,7 @@ int test_internal_function()
             min_tacts = tacts;
         //printf("fors_pkFromSig_ %x %x\n", PK_fors2[0], PK_fors2[1]);
     }
-    printf("crypto_sign_signature (autor) tacts = %I64d\n", min_tacts);
+    printf("crypto_sign_signature (autor) tacts = %" PRIu64 "\n", min_tacts);
 #endif
     res = 0;
     
@@ -4843,7 +4844,7 @@ int test_internal_function()
         
     }
     
-    printf("slh_verify_internal__OLD tacts = %I64d\n", min_tacts);
+    printf("slh_verify_internal__OLD tacts = %" PRIu64 "\n", min_tacts);
 
 #endif
     printf("slh_verify_internal__OLD res = %s\n", res == 0 ? "OK" : "ERROR");
@@ -4863,7 +4864,7 @@ int test_internal_function()
             min_tacts = tacts;
 
     }
-    printf("FIPS205_verify_internal tacts = %I64d\n", min_tacts);
+    printf("FIPS205_verify_internal tacts = %" PRIu64 "\n", min_tacts);
 
 #endif
     
@@ -4885,7 +4886,7 @@ int test_internal_function()
             min_tacts = tacts;
 
     }
-    printf("FIPS205_verify_internal_new__ tacts = %I64d\n", min_tacts);
+    printf("FIPS205_verify_internal_new__ tacts = %" PRIu64 "\n", min_tacts);
 
 #endif
 
@@ -4910,7 +4911,7 @@ int test_internal_function()
             min_tacts = tacts;
 
     }
-    printf("crypto_sign_verify (autor) tacts = %I64d\n", min_tacts);
+    printf("crypto_sign_verify (autor) tacts = %" PRIu64 "\n", min_tacts);
 
 #endif
 

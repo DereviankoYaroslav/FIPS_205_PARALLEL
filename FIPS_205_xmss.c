@@ -320,7 +320,7 @@ void calc_xmss_auth(uint8_t *auth, int ind, uint8_t* SK_seed,
 			blocks_[2] = _mm256_shuffle_epi8(blocks[2], maska_for_shuffle_64);
 			blocks_[3] = _mm256_shuffle_epi8(blocks[3], maska_for_shuffle_64);
 			memcpy(state, (uint8_t*)PK_seed_n_, sizeof(state));
-			AVX_sha512_compress((uint32_t*)state, blocks_);
+			AVX_sha512_compress((uint64_t*)state, blocks_);
 			state[0] = _mm256_shuffle_epi8(state[0], maska_for_shuffle_64);
 			memcpy(roots[i], &state[0], FIPS205_N);
 #endif
@@ -563,7 +563,7 @@ void FIPS205_AVX_xmss_node__(
 #else
 	__m256i blocks_[80];
 	__m256i blocks[4];
-	__m256i state[4];
+	__m256i state[2];
 	
 #define BLOCK_SIZE	128
 #endif

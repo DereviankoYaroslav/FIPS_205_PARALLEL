@@ -18,15 +18,18 @@
 int main()
 {
 	print_params();
+	printf("---------------------------------------------------------------------------------\n\n");
 	int res = 0;
 
 	printf("\nCPU SHA-NI (SHA-1/SHA-256) instructions:  %s\n", check_sha256() ? "Available" : "Not available");
 	printf("CPU SHA-512 instructions:  %s\n\n", is_sha512_usable() ? "Available" : "Not available");
+	printf("---------------------------------------------------------------------------------\n\n");
 
 	SetAVXConst();
 #ifdef _JSON_FILE
 	res = TestJSon();
-	printf("%s:\tTestJSon - %s\n", smodes[FIPS_205_MODE], res == OK ? "OK" : "ERROR"); 
+	printf("%s:\tTestJSon - %s\n", smodes[FIPS_205_MODE], res == OK ? "OK" : "ERROR");
+	printf("---------------------------------------------------------------------------------\n\n");
 #endif
 
 	res = test_2_b();
@@ -68,8 +71,8 @@ int main()
 	printf("test_base_2b %s\n", res == OK ? "OK" : "ERROR");
 	printf("---------------------------------------------------------------------------------\n\n");
 
-	//res = test_replace_key();
-	//printf("test_replace_key %s\n", res == OK ? "OK" : "ERROR");
+	res = test_replace_key();
+	printf("test_replace_key %s\n", res == OK ? "OK" : "ERROR");
 
 	res = test_FIPS205_wots();
 	printf("test_FIPS205_wots_gen_sign %s\n", res == OK ? "OK" : "ERROR");
