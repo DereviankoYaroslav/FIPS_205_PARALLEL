@@ -6,7 +6,7 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
 # Compiler flags for AVX/SHA/etc
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -mtune=native -mavx2 -msha -fopenmp -mfma -funroll-loops -finline-functions -fcommon")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -mtune=native -mavx2 -msha -fopenmp -mfma -funroll-loops -finline-functions")
 
 # Include directories
 include_directories(

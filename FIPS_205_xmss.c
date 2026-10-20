@@ -2,6 +2,8 @@
 
 #include <omp.h>
 
+#include "AVX512.h"
+
 
 // Algorithm 9 xmss_node(SK.seed, 𝑖, 𝑧, PK.seed, ADRS
 // Computes the root of a Merkle subtree of WOTS+ public keys.

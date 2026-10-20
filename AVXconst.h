@@ -51,8 +51,8 @@ extern __m256i fors_eight_256;
 
 void SetAVXConst();
 
-const uint8_t u8_maska_512[32];
-inline __m256i AVX2_srl2(__m256i src)
+extern const uint8_t u8_maska_512[32];
+static inline __m256i AVX2_srl2(__m256i src)
 {
 #if FIPS205_N == 16
 	__m256i r1 = _mm256_srli_si256(src, 2);
@@ -68,7 +68,7 @@ inline __m256i AVX2_srl2(__m256i src)
 
 
 
-inline __m256i AVX2_srl8(__m256i src)
+static inline __m256i AVX2_srl8(__m256i src)
 {
 
 	__m256i maska = _mm256_setr_epi64x(0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0x0000000000000000);
@@ -79,7 +79,7 @@ inline __m256i AVX2_srl8(__m256i src)
 	return r1;
 }
 
-inline __m256i AVX2_sll22(__m256i src)
+static inline __m256i AVX2_sll22(__m256i src)
 {
 	//__m256i dest = _mm256_setzero_si256();
 	__m256i dest = _mm256_permute2f128_si256(src, src, 0x08);

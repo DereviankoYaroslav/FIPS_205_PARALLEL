@@ -26,7 +26,7 @@ void mgf1_sha256(unsigned char* out, unsigned long outlen,
 void mgf1(unsigned char* out, unsigned long outlen,
     const unsigned char* in, unsigned long inlen);
 
-uint8_t state_seeded[40];
+extern uint8_t state_seeded[40];
 
 void seed_state(const unsigned char *pub_seed);
 

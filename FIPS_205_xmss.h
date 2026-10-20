@@ -32,7 +32,23 @@ void FIPS205_AVX_xmss_node__(
 #endif
 	uint8_t* adr);
 
-void FIPS205_AVX_xmss_sign(uint8_t* SIGtmp, const uint8_t* Msg, const uint8_t* SK_seed,
+void FIPS205_AVX_xmss_sign(
+	uint8_t* SIGtmp,
+	const uint8_t* Msg,
+	const uint8_t* SK_seed,
+	size_t idx,
+#ifdef SHAKE
+	const uint8_t* PK_seed,
+#else
+	const void* PK_seed,
+	const void* PK_seed_n,
+#endif
+	uint8_t* adr);
+
+void FIPS205_AVX_xmss_sign_(
+	uint8_t* SIGtmp,
+	const uint8_t* Msg,
+	const uint8_t* SK_seed,
 	size_t idx,
 #ifdef SHAKE
 	const uint8_t* PK_seed,

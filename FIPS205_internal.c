@@ -88,7 +88,7 @@ void FIPS205_sign_internal(uint8_t* sign, const uint8_t* M, uint32_t M_len, cons
 	uint8_t* opt_rand = addrng;
 
 	uint8_t* psign = sign;
-	uint8_t* buf = malloc(4 * FIPS205_N + M_len);
+	uint8_t* buf = malloc(4 * FIPS205_N + M_len + 64);
 	uint64_t idx_tree;
 
 	uint32_t idx_leaf;
@@ -251,7 +251,7 @@ void FIPS205_sign_internal_new__(uint8_t* sign, const uint8_t* M, uint32_t M_len
 	uint8_t* opt_rand = addrng;
 
 	uint8_t* psign = sign;
-	uint8_t* buf = malloc(4 * FIPS205_N + M_len);
+	uint8_t* buf = malloc(4 * FIPS205_N + M_len + 64);
 	uint64_t idx_tree;
 
 	uint32_t idx_leaf;
@@ -410,7 +410,7 @@ SUCCESS FIPS205_verify_internal(const uint8_t* M, uint32_t M_len, const uint8_t*
 3: end if
 	*/
 	SUCCESS success = ERROR;
-	uint8_t* buf = malloc(4 * FIPS205_N + M_len);
+	uint8_t* buf = malloc(4 * FIPS205_N + M_len + 64);
 		
 	if (buf &&
 		SIG_len == (1 + FIPS205_K * (1 + FIPS205_A) + FIPS205_H + FIPS205_D * FIPS205_LEN) * FIPS205_N)
@@ -513,7 +513,7 @@ SUCCESS FIPS205_verify_internal_new__(const uint8_t* M, uint32_t M_len, const ui
 3: end if
 	*/
 	SUCCESS success = ERROR;
-	uint8_t* buf = malloc(4 * FIPS205_N + M_len);
+	uint8_t* buf = malloc(4 * FIPS205_N + M_len + 64);
 
 	if (buf &&
 		SIG_len == (1 + FIPS205_K * (1 + FIPS205_A) + FIPS205_H + FIPS205_D * FIPS205_LEN) * FIPS205_N)

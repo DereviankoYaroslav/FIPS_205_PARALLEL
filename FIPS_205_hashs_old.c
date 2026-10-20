@@ -9,7 +9,7 @@
 #else
 #include <x86intrin.h>
 #endif
-uint64_t tacts;
+static uint64_t tacts, min_tacts;
 #endif
 
 #include "FIPS_205_Hashs_old.h"

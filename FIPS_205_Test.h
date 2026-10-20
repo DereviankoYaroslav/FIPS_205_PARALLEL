@@ -37,6 +37,7 @@ int test_FIPS205_xmss();
 //int test_FIPS205_HT();
 //int test_FIPS205_fors();
 int test_FIPS205_fors_and_HT();
+int test_internal_function();
 
 
 int test_2_b();

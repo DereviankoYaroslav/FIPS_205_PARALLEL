@@ -31,8 +31,7 @@
 #else
 #include <x86intrin.h>
 #endif
-uint64_t tacts;
-uint64_t min_tacts;
+static uint64_t tacts, min_tacts;
 #endif
 void sha256(uint8_t* out, const uint8_t* in, size_t inlen);
 
