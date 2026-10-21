@@ -31,7 +31,7 @@ set(SOURCES
         FIPS_205_ht.c
         FIPS_205_ht_old.c
         FIPS_205_internal_old.c
-        FIPS_205_json.c
+        FIPS_205_json_tests.c
         FIPS_205_xmss_old.c
         FIPS_205_Addr.c
         FIPS_205_Common_fun_old.c

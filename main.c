@@ -6,7 +6,7 @@
 #include "FIPS_205_Adr.h"
 #include "FIPS_205_Test.h"
 #include "avx_constants.h"
-#include "FIPS_205_JSon.h"
+#include "FIPS_205_json_tests.h"
 
 #if defined(_MSC_VER)
 	#include <intrin.h>
@@ -28,7 +28,7 @@ int main()
 	set_avx_constants();
 
 #ifdef _JSON_FILE
-	res = testJson();
+	res = test_json();
 	printf("%s:\tTestJSon - %s\n", smodes[FIPS_205_MODE], res == OK ? "OK" : "ERROR");
 	printf("---------------------------------------------------------------------------------\n\n");
 #endif
