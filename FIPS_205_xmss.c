@@ -217,9 +217,11 @@ void FIPS205_AVX_xmss_sign(uint8_t* SIGtmp, const uint8_t* Msg, const uint8_t* S
 	setKeyPairAddress(adr, (uint32_t)idx);
 #endif
 #ifdef SHAKE
-	FIPS205_AVX_wots_sign ((uint8_t (*)[FIPS205_N])p, Msg, SK_seed, PK_seed, adr);
+	//FIPS205_AVX_wots_sign ((uint8_t (*)[FIPS205_N])p, Msg, SK_seed, PK_seed, adr);
+	FIPS205_AVX_wots_sign_sorted((uint8_t(*)[FIPS205_N])p, Msg, SK_seed, PK_seed, adr);
 #else
-	FIPS205_AVX_wots_sign((uint8_t(*)[FIPS205_N])p, Msg, SK_seed, PK_seed, adr);
+	//FIPS205_AVX_wots_sign((uint8_t(*)[FIPS205_N])p, Msg, SK_seed, PK_seed, adr);
+	FIPS205_AVX_wots_sign_sorted((uint8_t(*)[FIPS205_N])p, Msg, SK_seed, PK_seed, adr);
 #endif
 
 }
@@ -390,11 +392,12 @@ void FIPS205_AVX_xmss_sign_(
 	setKeyPairAddress(adr, (uint32_t)idx);
 #endif
 #ifdef SHAKE
-	FIPS205_AVX_wots_sign((uint8_t(*)[FIPS205_N])p, Msg, SK_seed, PK_seed, adr);
+	//FIPS205_AVX_wots_sign((uint8_t(*)[FIPS205_N])p, Msg, SK_seed, PK_seed, adr);
+	FIPS205_AVX_wots_sign_sorted((uint8_t(*)[FIPS205_N])p, Msg, SK_seed, PK_seed, adr);
 #else
-	FIPS205_AVX_wots_sign((uint8_t(*)[FIPS205_N])p, Msg, SK_seed, PK_seed, adr);
+	//FIPS205_AVX_wots_sign((uint8_t(*)[FIPS205_N])p, Msg, SK_seed, PK_seed, adr);
+	FIPS205_AVX_wots_sign_sorted((uint8_t(*)[FIPS205_N])p, Msg, SK_seed, PK_seed, adr);
 #endif
-
 }
 
 

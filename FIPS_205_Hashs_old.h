@@ -7,7 +7,7 @@
 #include "fips202.h"
 #include"sha2.h"
 
-#ifdef _PREDCALC
+#if 1
 #ifndef SHAKE
 void predcalcs_pk_OLD(
 	uint32_t* dest_PK_seed,

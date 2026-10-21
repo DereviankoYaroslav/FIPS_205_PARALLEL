@@ -104,6 +104,7 @@ void FIPS205_wots_gen_sign_old(uint8_t sign[][FIPS205_N], const uint8_t* M, cons
 void FIPS205_wots_gen_sign_new(uint8_t sign[][FIPS205_N], const uint8_t* M, const uint8_t* SK_seed, __m256i state256, const __m256i blocksstate256[8], uint8_t* adr);
 void FIPS205_wots_gen_sign_new_(uint8_t sign[][FIPS205_N], const uint8_t* M, const uint8_t* SK_seed, const __m256i* state256, const __m256i blocksstate256[8], uint8_t* adr);
 void FIPS205_AVX_wots_sign(uint8_t sign[][FIPS205_N], const uint8_t* M, const uint8_t* SK_seed, /*const __m256i* state256, */const __m256i* blockstate256, uint8_t* adr);
+void FIPS205_AVX_wots_sign_sorted(uint8_t sign[][FIPS205_N], const uint8_t* M, const uint8_t* SK_seed, const __m256i* blockstate256, uint8_t* adr);
 void FIPS205_wots_gen_sign_new___(uint8_t sign[][FIPS205_N], const uint8_t* M, const uint8_t* SK_seed, /*const __m256i* state256, */const __m256i* blockstate256, uint8_t* adr);
 
 void FIPS205_wots_gen_pkFromSig_old(uint8_t pk[][FIPS205_N],

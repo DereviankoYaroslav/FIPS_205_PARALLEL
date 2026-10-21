@@ -15,7 +15,7 @@
 #include "SHA512.h"
 #include "AVX512.h"
 //#include "thash.h"
-//#include "OLD/api.h"
+#include "OLD/api.h"
 #include "OLD/thashx8.h"
 #include "OLD/wots.h"
 #include "OLD/fors.h"
@@ -2202,7 +2202,31 @@ int test_FIPS205_wots()
 
         
     }
-    
+
+#ifndef _DEBUG
+    min_tacts = 0xFFFFFFFFFFFFFFFF;
+    for (int k = 0; k < 16; ++k)
+    {
+#endif
+        memcpy(cur_adr, adr, ADR_SIZE);
+#ifndef _DEBUG
+        tacts = __rdtsc();
+#endif
+        FIPS205_AVX_wots_sign_sorted(sign2, M, SK_seed, state256_, cur_adr);
+#ifndef _DEBUG
+        tacts = __rdtsc() - tacts;
+        if (tacts < min_tacts)
+            min_tacts = tacts;
+    }
+    printf("FIPS205_AVX_wots_sign_sorted time = %lld\n", min_tacts);
+#endif
+    res = 0;
+    for (int i = 0; i < FIPS205_LEN; ++i)
+        for (int j = 0; j < FIPS205_N; ++j)
+            if (sign1[i][j] != sign2[i][j])
+                res = 1;
+    printf("FIPS205_AVX_wots_sign_sorted - %s\n", res == 0 ? "OK" : "ERROR");
+
     if (res == 0)
     {
         //memcpy(cur_adr, adr, ADR_SIZE);
@@ -2244,12 +2268,13 @@ int test_FIPS205_wots()
     min_tacts = 0xFFFFFFFFFFFFFFFF;
     for (int k = 0; k < 16; ++k)
     {
+        tacts = __rdtsc();
 #endif
-    wots_sign((uint8_t*)sign2, M, SK_seed, PK_seed, (uint32_t*)adr32);
+        wots_sign((uint8_t*)sign2, M, SK_seed, PK_seed, (uint32_t*)adr32);
 #ifndef _DEBUG
-    tacts = __rdtsc() - tacts;
-    if (tacts < min_tacts)
-        min_tacts = tacts;
+        tacts = __rdtsc() - tacts;
+        if (tacts < min_tacts)
+            min_tacts = tacts;
     }
     printf("wots_sign avtors time = %lld\n", min_tacts);
 #endif
@@ -4694,7 +4719,7 @@ int test_internal_function()
         
     }
     
-    static uint8_t sign1[FIPS205_SIG_BYTES], sign2[FIPS205_SIG_BYTES];
+    static uint8_t sign1[FIPS205_SIG_BYTES], sign2[FIPS205_SIG_BYTES], sign3[FIPS205_SIG_BYTES];
     uint8_t M[39];
     for (i = 0; i < sizeof(M); ++i)
         M[i] = rand() % 256;
@@ -4793,7 +4818,7 @@ int test_internal_function()
             res = 1;
     }
 
-    printf("FIPS205_sign_internal1 res = %s\n", res == 0? "OK" : "ERROR");
+    printf("FIPS205_sign_internal_new__ comparison with slh_sign_internal__OLD res = %s\n", res == 0? "OK" : "ERROR");
 
     /*
     int crypto_sign_signature(uint8_t *sig, size_t *siglen,
@@ -4813,7 +4838,7 @@ int test_internal_function()
         void FIPS205_sign_internal(uint8_t* sign, const uint8_t* M, uint32_t M_len, const uint8_t* SK, uint8_t* addrng)
         */
 
-        crypto_sign_signature(sign2, &siglen, M, sizeof(M),
+        crypto_sign_signature(sign3, &siglen, M, sizeof(M),
             sk);
 
 #ifndef _DEBUG
@@ -4824,6 +4849,18 @@ int test_internal_function()
     }
     printf("crypto_sign_signature (autor) tacts = %" PRIu64 "\n", min_tacts);
 #endif
+    //printf("\n");
+    //printf("sign2 after FIPS205_sign_internal_new__\n");
+    //print(FIPS205_SIG_BYTES * 8, sign2);
+
+    for (i = 0; i < FIPS205_SIG_BYTES; ++i)
+    {
+        if (sign2[i] != sign3[i])
+            res = 1;
+    }
+
+    printf("FIPS205_sign_internal_new__ comparison with crypto_sign_signature = %s\n", res == 0 ? "OK" : "ERROR");
+
     res = 0;
     
 #ifndef _DEBUG

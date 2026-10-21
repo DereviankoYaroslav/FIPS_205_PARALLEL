@@ -14,7 +14,7 @@ include_directories(
         ${PROJECT_SOURCE_DIR}/OLD  # old headers
 )
 
-add_compile_options(-Wno-implicit-function-declaration -Wno-deprecated-declarations)
+add_compile_options(-Wno-deprecated-declarations)
 add_compile_options(-Wno-incompatible-pointer-types)
 add_compile_options(-Wno-implicit-int)
 

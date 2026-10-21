@@ -6,6 +6,7 @@
 #endif
 #include "FIPS_205_Adr_old.h"
 #include "FIPS_205_Fors_old.h"
+#include "FIPS_205_Hashs_old.h"
 
 void fors_skGen__OLD(uint8_t* pFORS, const uint8_t* SK_seed, const void* PK_seed_,
 	uint8_t *adr, uint32_t ind)

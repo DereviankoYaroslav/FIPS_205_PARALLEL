@@ -164,22 +164,22 @@ void FIPS205_sign_internal(uint8_t* sign, const uint8_t* M, uint32_t M_len, cons
 		/*
 		uint8_t * FIPS205_AVX_fors_sign_new(uint8_t *sign, uint8_t *md, const uint8_t* SK_seed, const void* PK_256, const void* PK_256_512, uint8_t* adr)
 		*/
-		#if FIPS205_N == 16 
-			psign = FIPS205_AVX_fors_sign_new(
+#if FIPS205_N == 16
+			psign = FIPS205_AVX_fors_sign(
 				psign,
 				md,
 				SK_seed,
 				AVX_predcalc_pk_256_,      // BLOCK for 256 
-				&AVX_predcalc_pk_256,
+				AVX_predcalc_pk_256_,
 				adr
 			);     // for 256 or 512 predcalc
 #else
-			psign = FIPS205_AVX_fors_sign_new(
+			psign = FIPS205_AVX_fors_sign(
 				psign,
 				md,
 				SK_seed,
 				AVX_predcalc_pk_256_,      
-				AVX_predcalc_pk_512,
+				AVX_predcalc_pk_512_,
 				adr
 			);
 #endif
@@ -349,24 +349,26 @@ void FIPS205_sign_internal_new__(uint8_t* sign, const uint8_t* M, uint32_t M_len
 			// 16: PK𝐹 𝑂𝑅𝑆 ← fors_pkFromSig(SIG𝐹 𝑂𝑅𝑆, 𝑚𝑑,PK.seed,ADRS)
 		uint8_t pkFromSig[FIPS205_N];
 #if FIPS205_N == 16
-		FIPS205_AVX_fors_pkFromSig_new__(
+		//FIPS205_AVX_fors_pkFromSig_new__(
+		FIPS205_AVX_fors_pkFromSig(
 			//fors_pkFromSig___OLD(
 			pkFromSig,
 			fors_sign,
 			md,
 			&AVX_predcalc_pk_256,		// one 256 0r 512
-			&AVX_predcalc_pk_256,		// block 256
-			//AVX_predcalc_pk_256_,		// block 256, or 512
+			AVX_predcalc_pk_256_,		// block 256
+			AVX_predcalc_pk_256_,		// block 256, or 512
 			adr);
 #else
-		FIPS205_AVX_fors_pkFromSig_new__(
+		//FIPS205_AVX_fors_pkFromSig_new__(
+		FIPS205_AVX_fors_pkFromSig(
 			//fors_pkFromSig___OLD(
 			pkFromSig,
 			fors_sign,
 			md,
 			&AVX_predcalc_pk_512,		// one 256 0r 512
-			&AVX_predcalc_pk_256,		// block 256
-			//AVX_predcalc_pk_512_,		// block 256, or 512
+			AVX_predcalc_pk_256_,		// block 256
+			AVX_predcalc_pk_512_,		// block 256, or 512
 			adr);
 #endif
 
@@ -567,24 +569,25 @@ SUCCESS FIPS205_verify_internal_new__(const uint8_t* M, uint32_t M_len, const ui
 		uint8_t pkFromSig[FIPS205_N];
 
 #if FIPS205_N == 16
-		FIPS205_AVX_fors_pkFromSig_new__(
+		FIPS205_AVX_fors_pkFromSig(
 			pkFromSig,
 			SIG_FORS,
 			md,
-			&AVX_predcalc_pk_256,		// one 256 0r 512
 			&AVX_predcalc_pk_256,		// one 256
-			//AVX_predcalc_pk_256_,		// block 512
+			AVX_predcalc_pk_256_,		// block 256
+			AVX_predcalc_pk_256_,		// block for H (N = 16)
 			adr);
 #else
-		FIPS205_AVX_fors_pkFromSig_new__(
+		FIPS205_AVX_fors_pkFromSig(
 			pkFromSig,
 			SIG_FORS,
 			md,
-			&AVX_predcalc_pk_512,		// one 256 0r 512
-			&AVX_predcalc_pk_256,		// block 256
-			//AVX_predcalc_pk_512_,		// block 512
+			&AVX_predcalc_pk_512,		// one 512
+			AVX_predcalc_pk_256_,		// block 256
+			AVX_predcalc_pk_512_,		// block 512
 			adr);
 #endif
+
 		success = FIPS205_AVX_ht_verify(
 			pkFromSig,
 			SIG_HT,

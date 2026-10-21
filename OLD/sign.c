@@ -8,6 +8,8 @@
 #include "wots.h"
 #include "thash.h"
 #include "utils.h"
+#include "hash.h"
+#include "fors.h"
 
 
 /**

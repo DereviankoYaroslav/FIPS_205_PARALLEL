@@ -28,12 +28,12 @@ extern size_t smodes_count;
 //#define FIPS_205_MODE	SLH_DSA_SHA2_128f // +
 //#define FIPS_205_MODE	SLH_DSA_SHAKE_128f
 
-#define FIPS_205_MODE	SLH_DSA_SHA2_192s // +
+//#define FIPS_205_MODE	SLH_DSA_SHA2_192s // +
 //#define FIPS_205_MODE	SLH_DSA_SHAKE_192s
 //#define FIPS_205_MODE	SLH_DSA_SHA2_192f // +
 //#define FIPS_205_MODE	SLH_DSA_SHAKE_192f
 
-//#define FIPS_205_MODE	SLH_DSA_SHA2_256s // +
+#define FIPS_205_MODE	SLH_DSA_SHA2_256s // +
 //#define FIPS_205_MODE	SLH_DSA_SHAKE_256s
 //#define FIPS_205_MODE	SLH_DSA_SHA2_256f // +
 //#define FIPS_205_MODE	SLH_DSA_SHAKE_256f
@@ -136,7 +136,7 @@ extern size_t smodes_count;
 #define FIPS205_LEN			(FIPS205_LEN1 + FIPS205_LEN2)
 #define	FIPS205_W			16
 
-#ifdef _PREDCALC
+#if 1
 void sha256_predcalc_pk(uint32_t* predcalc_pk, const uint8_t* pk);
 void sha512_predcalc_pk(uint64_t* predcalc_pk, const uint8_t* pk);
 

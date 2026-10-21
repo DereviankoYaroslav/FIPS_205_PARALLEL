@@ -37,7 +37,7 @@ void mgf1_sha256(unsigned char* out, unsigned long outlen,
 void HMAC256(uint8_t* dest, const uint8_t* sk, const uint8_t* src, size_t len);
 SUCCESS Test_HMAC_256();
 
-#ifdef _PREDCALC
+#if 1
 void sha256_with_predcalc2_(uint8_t* out, const uint32_t* predcalc, uint8_t* in, size_t inlen);
 void sha256_with_predcalc_(uint8_t* out, uint32_t* predcalc, uint8_t* in, size_t inlen);
 

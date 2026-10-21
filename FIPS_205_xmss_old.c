@@ -7,6 +7,7 @@
 #endif
 
 #include "FIPS_205_xmss_old.h"
+#include "FIPS_205_Hashs_old.h"
 
 void xmss_node__OLD(
 	uint8_t* PK_root,

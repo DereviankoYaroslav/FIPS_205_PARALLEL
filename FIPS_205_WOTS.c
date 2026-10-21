@@ -1095,6 +1095,106 @@ void load_datas(__m256i* datas256, const uint8_t datas8[][FIPS205_N], const uint
 
 }
 
+void FIPS205_AVX_wots_sign_sorted(uint8_t sign[][FIPS205_N], const uint8_t* M, const uint8_t* SK_seed,
+	const __m256i* blockstate256, uint8_t* adr)
+{
+	enum { LEN8 = (FIPS205_LEN + 7) / 8 * 8, POR = (FIPS205_LEN + 7) / 8 };
+
+	/* 1. message -> base-16 digits + checksum (as in FIPS205_AVX_wots_sign) */
+	ALIGN64 uint32_t base_b[LEN8];
+	base_4_new(base_b, M, FIPS205_N * 2);
+	uint32_t csum = 0;
+	for (int i = 0; i < FIPS205_LEN1; ++i)
+		csum += FIPS205_W - 1 - base_b[i];
+	base_b[FIPS205_LEN1] = (csum >> 8);
+	base_b[FIPS205_LEN1 + 1] = (csum >> 4) & 0xF;
+	base_b[FIPS205_LEN1 + 2] = (csum) & 0xF;
+	for (int i = FIPS205_LEN; i < LEN8; ++i)
+		base_b[i] = 0;			/* padding lanes: no hashing needed */
+
+	/* 2. secret keys for all chains, 8 at a time (as in FIPS205_AVX_wots_sign) */
+	uint8_t skADRS[ADR_SIZE];
+	memcpy(skADRS, adr, ADR_SIZE);
+	setType(skADRS, WOTS_PRF);
+	setKeyPairAddress(skADRS, getKeyPairAddress(adr));
+
+	__m256i in64[16], blocks[64], keysBlocks[LEN8];
+	init_in_block(in64, skADRS, SK_seed);
+	memcpy(in64 + 2, in64, 2 * sizeof(__m256i));
+	memcpy(in64 + 4, in64, 4 * sizeof(__m256i));
+	memcpy(in64 + 8, in64, 8 * sizeof(__m256i));
+	create_blocks_for_in64(blocks, in64);
+	FIPS205_wots_gen_sk_new(keysBlocks, SK_seed, blockstate256, blocks);
+
+	/* transposed key blocks -> one byte string per chain (padded length, so
+	   load_datas never reads past the array) */
+	ALIGN32 uint8_t sk[LEN8][FIPS205_N];
+	for (int i = 0; i < POR; ++i)
+	{
+		const uint32_t* k32 = (const uint32_t*)(keysBlocks + 8 * i);
+		for (int j = 0; j < 8; ++j)
+		{
+			__m256i r = _mm256_shuffle_epi8(
+				_mm256_i32gather_epi32((const int*)(k32 + j), idx8, 4), maska_for_shuffle_32);
+			memcpy(sk[8 * i + j], &r, FIPS205_N);
+		}
+	}
+
+	/* 3. sort chains by number of steps */
+	uint32_t iters[LEN8], numbers[LEN8];
+	sort_signs(iters, numbers, base_b);
+
+	/* hash blocks for the chain function F (WOTS_HASH address, as in
+	   FIPS205_AVX_wots_pkFromSig) */
+	init_in_block0(in64, adr);
+	memcpy(in64 + 2, in64, 2 * sizeof(__m256i));
+	memcpy(in64 + 4, in64, 4 * sizeof(__m256i));
+	memcpy(in64 + 8, in64, 8 * sizeof(__m256i));
+	create_blocks_for_in64(blocks, in64);
+	const __m256i hash_addr0 = _mm256_andnot_si256(HashAddressClearMaska, blocks[5]);
+
+	/* 4. groups of 8 chains */
+	for (int g = 0; g < POR; ++g)
+	{
+		const uint32_t* n32 = numbers + 8 * g;
+		const uint32_t* i32 = iters + 8 * g;		/* ascending */
+
+		ALIGN32 __m256i temp[8] = { 0 };
+		__m256i curKeys[8];
+		load_datas(temp, (const uint8_t(*)[FIPS205_N])sk, n32);
+		const uint32_t* t32 = (const uint32_t*)temp;
+		for (int w = 0; w < 8; ++w)
+			curKeys[w] = _mm256_i32gather_epi32((const int*)(t32 + w), idx8, 4);
+
+		blocks[4] = _mm256_slli_epi32(_mm256_loadu_si256((const __m256i*)n32), 16);	/* chain addresses */
+		blocks[5] = hash_addr0;														/* hash address 0  */
+
+		uint32_t steps = 0, k = 0;
+		for (;;)
+		{
+			/* lanes whose chain is complete after 'steps' steps */
+			while (k < 8 && i32[k] == steps)
+			{
+				if (n32[k] < FIPS205_LEN)
+				{
+					__m256i r = _mm256_shuffle_epi8(
+						_mm256_i32gather_epi32((const int*)((const uint32_t*)curKeys + k), idx8, 4),
+						maska_for_shuffle_32);
+					memcpy(sign[n32[k]], &r, FIPS205_N);
+				}
+				++k;
+			}
+			if (k == 8)
+				break;
+			replace_blocks_key8__(blocks, curKeys);
+			memcpy(curKeys, blockstate256, 8 * sizeof(__m256i));
+			AVX_sha256_compress8(curKeys, blocks);
+			blocks[5] = _mm256_add_epi32(blocks[5], _mm256_set1_epi32(1 << 16));
+			++steps;
+		}
+	}
+}
+
 void FIPS205_wots_gen_pkFromSig_old(uint8_t pk[][FIPS205_N],
 	const uint8_t sign[][FIPS205_N],
 	const uint8_t* M,
