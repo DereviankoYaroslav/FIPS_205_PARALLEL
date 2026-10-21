@@ -379,7 +379,8 @@ uint8_t *read_json_title(
 	return cur;
 }
 
-uint8_t *skip_quot(uint8_t* cur)
+uint8_t *skip_quot(
+	uint8_t* cur)
 {
 	while (*cur != 0 && *cur != '\"')
 	{
@@ -394,8 +395,8 @@ uint8_t *skip_quot(uint8_t* cur)
 	return cur;
 }
 
-int ReadGroups(
-	const PJSON_TEST_GROUP group,
+int read_groups(
+	PJSON_TEST_GROUP group,
 	uint8_t* begin_cur)
 {
 	uint8_t* cur = begin_cur;
@@ -695,8 +696,7 @@ SUCCESS read_json_group_title(
 	return success;
 }
 
-static void reset_predcalc(
-	void)
+static void reset_predcalc()
 {
 #ifndef SHAKE
 	is_predcalc_pk_256 = 0;
@@ -992,7 +992,8 @@ SUCCESS json_sig_ver(
 	return executed ? overall : ERROR;
 }
 
-SUCCESS test_json_file(const char* fn)
+SUCCESS test_json_file(
+	const char* fn)
 {
 	SUCCESS success = ERROR;
 	size_t fsize = 0;
@@ -1029,7 +1030,7 @@ SUCCESS test_json_file(const char* fn)
 
 		if (cur && cur < cur_max)
 		{
-			int groups_count = ReadGroups(garr, cur);
+			int groups_count = read_groups(garr, cur);
 			json_datas->groups_count = groups_count;
 
 			if (json_datas->mode == KEYGEN_TYPE)
