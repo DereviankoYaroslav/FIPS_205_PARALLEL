@@ -161,13 +161,13 @@ SUCCESS slh_sign_internal__OLD(uint8_t* SIG, const uint8_t* MSG, size_t MSG_len,
 #if 0
 		uint8_t* md = digest, * tmp_idxtree = digest + (K * A + 7) / 8,
 			* tmp_idxleaf = tmp_idxtree + (H - H / D + 7) / 8;
-		uint64_t idxtree = toInt64(tmp_idxtree, (H - H / D + 7) / 8) & (((uint64_t)1 << (H - H / D)) - 1);
-		uint32_t idxleaf = toInt32(tmp_idxleaf, ((H + 8 * D - 1) / (8 * D))) % ((uint64_t)1 << (H / D));
+		uint64_t idxtree = to_int_64(tmp_idxtree, (H - H / D + 7) / 8) & (((uint64_t)1 << (H - H / D)) - 1);
+		uint32_t idxleaf = to_int_32(tmp_idxleaf, ((H + 8 * D - 1) / (8 * D))) % ((uint64_t)1 << (H / D));
 #else
 		//uint8_t md[(K * A + 7) / 8];
 		uint8_t *md = digest;
 		uint32_t idxleaf;
-		uint64_t idxtree = DigestParse(/*md, */&idxleaf, digest);
+		uint64_t idxtree = digest_parse(/*md, */&idxleaf, digest);
 #endif
 		
 		
@@ -282,13 +282,13 @@ SUCCESS slh_verify_internal__OLD(const uint8_t* M_, size_t M_len, const uint8_t*
 #if 0
 		uint8_t* md = digest, * tmp_idxtree = digest + (K * A + 7) / 8,
 			* tmp_idxleaf = tmp_idxtree + (H - H / D + 7) / 8;
-		uint64_t idxtree = toInt64(tmp_idxtree, (H - H / D + 7) / 8) & (((uint64_t)1 << (H - H / D)) - 1);
-		uint32_t idxleaf = toInt32(tmp_idxleaf, ((H + 8 * D - 1) / (8 * D))) % ((uint64_t)1 << (H / D));
+		uint64_t idxtree = to_int_64(tmp_idxtree, (H - H / D + 7) / 8) & (((uint64_t)1 << (H - H / D)) - 1);
+		uint32_t idxleaf = to_int_32(tmp_idxleaf, ((H + 8 * D - 1) / (8 * D))) % ((uint64_t)1 << (H / D));
 #else
 
 		uint8_t* md = digest;
 		uint32_t idxleaf;
-		uint64_t idxtree = DigestParse(/*md, */&idxleaf, digest);
+		uint64_t idxtree = digest_parse(/*md, */&idxleaf, digest);
 #endif
 
 

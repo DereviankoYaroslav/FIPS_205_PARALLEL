@@ -298,7 +298,7 @@ void FIPS205_wots_gen_sign_old(uint8_t sign[][FIPS205_N], const uint8_t *M, cons
 	// 𝑐𝑠𝑢𝑚 ← 𝑐𝑠𝑢𝑚 ≪ ((8 − ((𝑙𝑒𝑛2 ⋅ 𝑙𝑔𝑤) mod 8)) mod 8)
 	csum = csum << ((8 - ((FIPS205_LEN2 * 4) % 8)) % 8);
 	uint8_t temp[2];
-	toByte16(temp, csum);
+	to_byte16(temp, csum);
 
 	base_2b_old(base_b + FIPS205_LEN1, temp, 4, FIPS205_LEN2);
 
@@ -688,7 +688,7 @@ void FIPS205_wots_gen_sign_new(uint8_t sign[][FIPS205_N], const uint8_t* M, cons
 	// 𝑐𝑠𝑢𝑚 ← 𝑐𝑠𝑢𝑚 ≪ ((8 − ((𝑙𝑒𝑛2 ⋅ 𝑙𝑔𝑤) mod 8)) mod 8)
 	//csum = csum << 4/*((8 - ((FIPS205_LEN2 * 4) % 8)) % 8)*/;
 	//uint8_t temp[2];
-	//toByte16(temp, csum);
+	//to_byte16(temp, csum);
 	
 	/*base_b[FIPS205_LEN1] = (csum >> 12) ;
 	base_b[FIPS205_LEN1+1] = (csum >> 8) & 0xFF;
@@ -784,7 +784,7 @@ void FIPS205_wots_gen_sign_new_(uint8_t sign[][FIPS205_N], const uint8_t* M, con
 	
 	//csum = csum << 4/*((8 - ((FIPS205_LEN2 * 4) % 8)) % 8)*/;
 	//uint8_t temp[2];
-	//toByte16(temp, csum);
+	//to_byte16(temp, csum);
 	
 	base_b[FIPS205_LEN1] = (csum >> 8) ;
 	base_b[FIPS205_LEN1+1] = (csum >> 4) & 0xF;
@@ -1214,7 +1214,7 @@ void FIPS205_wots_gen_pkFromSig_old(uint8_t pk[][FIPS205_N],
 	// 𝑐𝑠𝑢𝑚 ← 𝑐𝑠𝑢𝑚 ≪ ((8 − ((𝑙𝑒𝑛2 ⋅ 𝑙𝑔𝑤) mod 8)) mod 8)
 	csum = csum << ((8 - ((FIPS205_LEN2 * 4) % 8)) % 8);
 	uint8_t temp[2];
-	toByte16(temp, csum);
+	to_byte16(temp, csum);
 
 	base_2b_old(base_b + FIPS205_LEN1, temp, 4, FIPS205_LEN2);
 

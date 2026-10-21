@@ -14,7 +14,7 @@
 
 #include "FIPS_205_Hashs.h"
 
-#include "AVXconst.h"
+#include "avx_constants.h"
 #include "AVX256.h"
 #include "OLD/sha256.h"
 

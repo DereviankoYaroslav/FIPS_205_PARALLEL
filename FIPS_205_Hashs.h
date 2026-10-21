@@ -4,7 +4,7 @@
 #include <string.h>
 #include "FIPS_205_Params.h"
 #include "FIPS_205_Adr.h"
-#include "AVXconst.h"
+#include "avx_constants.h"
 void AVX_PREDCALC_VALUE(void* state_, const uint8_t* in, uint32_t in_len);
 
 #define	PRF	F

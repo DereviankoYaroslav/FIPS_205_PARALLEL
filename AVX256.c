@@ -7,12 +7,12 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <string.h>
-#include "AVXconst.h"
+#include "avx_constants.h"
 #include "SHA256_device.h"
 #include "FIPS_205_Params.h"
 
 #include "FIPS_205_Adr.h"
-#include "Common.h"
+#include "common.h"
 
 
 #ifndef _DEBUG
@@ -861,13 +861,13 @@ void AVX_MGF1_sha256(uint8_t* out, uint32_t outlen,
     uint32_t blocks = outlen / 32;
     uint8_t* pend = inbuf + inlen;
     for (i = 0; i < blocks; i++) {
-        toByte32_(pend, i);
+        to_byte32_(pend, i);
         AVX_sha256 (out, inbuf, inlen + 4, 32);
         out += 32;
     }
     /* Until we cannot anymore, and we fill the remainder. */
     if (outlen > blocks * 32) {
-        toByte32_(pend, i);
+        to_byte32_(pend, i);
         AVX_sha256(outbuf, inbuf, inlen + 4, 32);
         memcpy(out, outbuf, outlen - i * 32);
     }

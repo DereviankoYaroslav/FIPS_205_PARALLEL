@@ -9,9 +9,9 @@
 #include "FIPS_205_Params.h"
 #include "FIPS_205_Adr.h"
 #include "FIPS205_WOTS.h"
-#include "AVXconst.h"
+#include "avx_constants.h"
 #include "AVX256.h"
-#include "Common.h"
+#include "common.h"
 void FIPS205_AVX_fors_init_in_block0(__m256i* in256, const uint8_t* adr);
 void FIPS205_AVX_fors_init(__m256i *in64, const uint8_t* SK_seed, uint8_t* adr);
 void create_blocks_for_in128(__m256i* blocks, __m256i* in128);

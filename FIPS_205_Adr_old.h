@@ -389,7 +389,7 @@ static INLINE void setTreeIndex_OLD(PADR_OLD adr, uint32_t value)
 static INLINE uint32_t getLayerAddress_OLD(PADR_OLD adr)
 {
 #if 1
-	return toInt32(adr->layer_Address_OLD, 4);
+	return to_int_32(adr->layer_Address_OLD, 4);
 #else
 	{
 		uint32_t value = 0;
@@ -406,7 +406,7 @@ static INLINE uint32_t getLayerAddress_OLD(PADR_OLD adr)
 static INLINE uint64_t getTreeAddress_OLD(PADR_OLD adr)
 {
 #if 1
-	return toInt64(adr->tree_Address_OLD, 12);
+	return to_int_64(adr->tree_Address_OLD, 12);
 #else
 	uint8_t* p = (uint8_t*)adr->tree_Address;
 	uint64_t value = *p++;
@@ -426,7 +426,7 @@ static INLINE uint64_t getTreeAddress_OLD(PADR_OLD adr)
 static INLINE uint32_t getType_OLD(PADR_OLD adr)
 {
 #if 1
-	return toInt32(adr->type_OLD, 4);
+	return to_int_32(adr->type_OLD, 4);
 #else
 	uint8_t* p = (uint8_t*)adr->type;
 	uint32_t value = *p++;
@@ -440,7 +440,7 @@ static INLINE uint32_t getType_OLD(PADR_OLD adr)
 static INLINE uint32_t getKeyPairAddress_OLD(PADR_OLD adr)
 {
 #if 1
-	return toInt32(adr->wha.key_pair_Address_OLD, 4);
+	return to_int_32(adr->wha.key_pair_Address_OLD, 4);
 #else
 	uint8_t* p = (uint8_t*)adr->wha.key_pair_Address;
 	uint32_t value = *p++;
@@ -454,7 +454,7 @@ static INLINE uint32_t getKeyPairAddress_OLD(PADR_OLD adr)
 static INLINE uint32_t getTreeIndex_OLD(PADR_OLD adr)
 {
 #if 1
-	return toInt32(adr->hta.tree_index_OLD, 4);
+	return to_int_32(adr->hta.tree_index_OLD, 4);
 #else
 	uint8_t* p = (uint8_t*)adr->hta.tree_index;
 	uint32_t value = *p++;
@@ -532,13 +532,13 @@ static INLINE void setTreeIndex_c_OLD(PADR_C_OLD adr, uint32_t i)
 
 static INLINE uint32_t getKeyPairAddress_c_OLD(PADR_C_OLD adr)
 {
-	return toInt32(adr->wha.key_pair_Address_OLD, 4);
+	return to_int_32(adr->wha.key_pair_Address_OLD, 4);
 	
 }
 
 static INLINE uint32_t getTreeIndex_c_OLD(PADR_C_OLD adr)
 {
-	return toInt32(adr->fta.tree_index_OLD, 4);
+	return to_int_32(adr->fta.tree_index_OLD, 4);
 
 }
 /*

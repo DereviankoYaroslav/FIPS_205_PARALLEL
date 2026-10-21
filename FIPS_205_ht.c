@@ -1,5 +1,5 @@
 ﻿#include "FIPS205_ht.h"
-uint64_t DigestParse(uint32_t* idxleaf, const uint8_t* digest);
+uint64_t digest_parse(uint32_t* idxleaf, const uint8_t* digest);
 
 uint8_t* FIPS205_AVX_ht_sign(uint8_t* pSig, const uint8_t* M, const uint8_t* SK_seed,
 #ifdef SHAKE

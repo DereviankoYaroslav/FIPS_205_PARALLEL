@@ -1,10 +1,10 @@
 #include <malloc.h>
 
-#include "AVXconst.h"
+#include "avx_constants.h"
 #include "AVX512.h"
 #include "SHA512_defined.h"
 #include "SHA512.h"
-#include "Common.h"
+#include "common.h"
 
 #if _WIN32
 #else
@@ -1126,13 +1126,13 @@ void AVX_MGF1_sha512(
     uint32_t last_block_len = outlen % 64;
     uint8_t* pend = inbuf + inlen;
     for (i = 0; i < blocks; i++) {
-        toByte32_(pend, i);
+        to_byte32_(pend, i);
         AVX_sha512(out, inbuf, inlen + 4, 64);
         out += 64;
     }
     
     if (last_block_len) {
-        toByte32_(pend, i);
+        to_byte32_(pend, i);
         AVX_sha512(out, inbuf, inlen + 4, last_block_len);
         //memcpy(out, outbuf, outlen - i * 64);
     }

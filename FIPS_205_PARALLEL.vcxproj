@@ -144,8 +144,8 @@
   <ItemGroup>
     <ClInclude Include="AVX256.h" />
     <ClInclude Include="AVX512.h" />
-    <ClInclude Include="AVXconst.h" />
-    <ClInclude Include="Common.h" />
+    <ClInclude Include="avx_constants.h" />
+    <ClInclude Include="common.h" />
     <ClInclude Include="FIPS_205_internal.h" />
     <ClInclude Include="FIPS205_WOTS.h" />
     <ClInclude Include="FIPS_205_Adr.h" />
@@ -184,8 +184,8 @@
   <ItemGroup>
     <ClCompile Include="AVX256.c" />
     <ClCompile Include="AVX512.c" />
-    <ClCompile Include="AVXconst.c" />
-    <ClCompile Include="Common.c" />
+    <ClCompile Include="avx_constants.c" />
+    <ClCompile Include="common.c" />
     <ClCompile Include="fips202.c" />
     <ClCompile Include="FIPS205_internal.c" />
     <ClCompile Include="FIPS_205_fors.c" />

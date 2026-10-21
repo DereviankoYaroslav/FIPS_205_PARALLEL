@@ -2,7 +2,7 @@
 
 
 #include "FIPS_205_internal.h"
-#include "Common.h"
+#include "common.h"
 #include "print.h"
 #ifndef SHAKE
 uint32_t is_predcalc_pk_256;
@@ -142,7 +142,7 @@ void FIPS205_sign_internal(uint8_t* sign, const uint8_t* M, uint32_t M_len, cons
 		
 		free(buf);
 		memcpy(md, digest, (FIPS205_K * FIPS205_A + 7)/8);
-		idx_tree = (uint64_t)DigestParse(&idx_leaf, digest);
+		idx_tree = (uint64_t)digest_parse(&idx_leaf, digest);
 		//printf("idx_tree %lld", idx_tree);
 		/*
 		11: ADRS.setTreeAddress(𝑖𝑑𝑥𝑡𝑟𝑒𝑒)
@@ -305,7 +305,7 @@ void FIPS205_sign_internal_new__(uint8_t* sign, const uint8_t* M, uint32_t M_len
 
 		free(buf);
 		memcpy(md, digest, (FIPS205_K * FIPS205_A + 7) / 8);
-		idx_tree = (uint64_t)DigestParse(&idx_leaf, digest);
+		idx_tree = (uint64_t)digest_parse(&idx_leaf, digest);
 		//printf("idx_tree new__ %lld", idx_tree);
 		/*
 		11: ADRS.setTreeAddress(𝑖𝑑𝑥𝑡𝑟𝑒𝑒)
@@ -452,7 +452,7 @@ SUCCESS FIPS205_verify_internal(const uint8_t* M, uint32_t M_len, const uint8_t*
 		free(buf);
 		//memcpy(md, digest, FIPS205_M);
 		uint32_t idx_leaf;
-		uint64_t idx_tree = (uint64_t)DigestParse(&idx_leaf, digest);
+		uint64_t idx_tree = (uint64_t)digest_parse(&idx_leaf, digest);
 		uint8_t adr[ADR_SIZE] = { 0 };
 		/*
 		14: ADRS.setTreeAddress(𝑖𝑑𝑥𝑡𝑟𝑒𝑒) ▷ compute FORS public key
@@ -555,7 +555,7 @@ SUCCESS FIPS205_verify_internal_new__(const uint8_t* M, uint32_t M_len, const ui
 		free(buf);
 		//memcpy(md, digest, FIPS205_M);
 		uint32_t idx_leaf;
-		uint64_t idx_tree = (uint64_t)DigestParse(&idx_leaf, digest);
+		uint64_t idx_tree = (uint64_t)digest_parse(&idx_leaf, digest);
 		uint8_t adr[ADR_SIZE] = { 0 };
 		/*
 		14: ADRS.setTreeAddress(𝑖𝑑𝑥𝑡𝑟𝑒𝑒) ▷ compute FORS public key

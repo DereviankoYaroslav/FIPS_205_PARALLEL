@@ -49,7 +49,7 @@ typedef struct _JSON
 	JSON_TEST_GROUP groups[30];
 }JSON, * PJSON;
 
-SUCCESS TestJSon();
+SUCCESS testJson();
 //SUCCESS TestJsonFile(PJSON  json_datas, const char* fn);
 int ReadGroups(PJSON_TEST_GROUP group, uint8_t* begin_cur);
 extern char HashName[][16];

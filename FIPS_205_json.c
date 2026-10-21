@@ -977,7 +977,7 @@ SUCCESS TestJsonFile(const char* fn)
 }
 
 
-SUCCESS TestJSon()
+SUCCESS testJson()
 {
 
 	SUCCESS success = OK;

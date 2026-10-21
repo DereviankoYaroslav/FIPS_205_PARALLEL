@@ -107,7 +107,7 @@ SUCCESS test_toInt_toByte()
 			((uint64_t)rand() << (64 - 45))|
 			rand (), X1;
 		toByte64(S, X, 8);
-		X1 = toInt64(S, 8);
+		X1 = to_int_64(S, 8);
 		success |= X != X1;
 	}
 

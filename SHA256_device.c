@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include <string.h>
-#include "Common.h"
+#include "common.h"
 #include "FIPS_205_Params.h"
 #include "SHA256_device.h"
 
@@ -971,13 +971,13 @@ void AVX_MGF1_sha256_device(unsigned char* out, unsigned long outlen,
 
     /* While we can fit in at least another full block of sha256 output.. */
     for (i = 0; (i + 1) * 32 <= outlen; i++) {
-        toByte32_(inbuf + inlen, i);
+        to_byte32_(inbuf + inlen, i);
         AVX_sha256_device(out, inbuf, inlen + 4, 32);
         out += 32;
     }
     /* Until we cannot anymore, and we fill the remainder. */
     if (outlen > i * 32) {
-        toByte32_(inbuf + inlen, i);
+        to_byte32_(inbuf + inlen, i);
         AVX_sha256_device(outbuf, inbuf, inlen + 4, 32);
         memcpy(out, outbuf, outlen - i * 32);
     }

@@ -1,50 +1,46 @@
 #include <stdio.h>
 
 #include "SHA256_device.h"
-
-#if defined(_MSC_VER)
-#include <intrin.h>
-#else
-#include <x86intrin.h>
-#endif
-
-#include "Common.h"
+#include "common.h"
 #include "FIPS_205_Params.h"
 #include "FIPS_205_Adr.h"
 #include "FIPS_205_Test.h"
-#include "AVXconst.h"
+#include "avx_constants.h"
 #include "FIPS_205_JSon.h"
+
+#if defined(_MSC_VER)
+	#include <intrin.h>
+#else
+	#include <x86intrin.h>
+#endif
 
 int main()
 {
+	int res = 0;
+
 	print_params();
 	printf("---------------------------------------------------------------------------------\n\n");
-	int res = 0;
 
 	printf("\nCPU SHA-NI (SHA-1/SHA-256) instructions:  %s\n", check_sha256() ? "Available" : "Not available");
 	printf("CPU SHA-512 instructions:  %s\n\n", is_sha512_usable() ? "Available" : "Not available");
 	printf("---------------------------------------------------------------------------------\n\n");
 
-	SetAVXConst();
+	set_avx_constants();
+
 #ifdef _JSON_FILE
-	res = TestJSon();
+	res = testJson();
 	printf("%s:\tTestJSon - %s\n", smodes[FIPS_205_MODE], res == OK ? "OK" : "ERROR");
 	printf("---------------------------------------------------------------------------------\n\n");
 #endif
 
-	res = test_2_b();
-	printf("test_2_b? %s\n", res == 0 ? "OK" : "ERROR");
-
 #if FIPS205_N > 16
-
 	res = test_AVX_sha512();
 	printf("test_AVX_sha512 %s\n", res == OK ? "OK" : "ERROR");
 
 	res = test_AVX_sha512_compress4();
 	printf("test_AVX_sha512_compress4 %s\n", res == OK ? "OK" : "ERROR");
-
-	
 #endif
+
 	res = test_addr();
 	printf("test_addr %s\n", res == OK ? "OK" : "ERROR");
 	printf("---------------------------------------------------------------------------------\n\n");

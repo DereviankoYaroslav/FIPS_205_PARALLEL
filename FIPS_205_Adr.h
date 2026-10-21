@@ -2,7 +2,7 @@
 #define FIPS_205_ADR_h
 #include <string.h>
 #include "FIPS_205_Params.h"
-#include "AVXconst.h"
+#include "avx_constants.h"
 
 #define	WOTS_HASH	0
 #define	WOTS_PK		1

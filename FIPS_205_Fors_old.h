@@ -2,10 +2,10 @@
 #define FIPS_205_Fors_OLD_h
 #include "FIPS_205_Params.h"
 #include "FIPS_205_Hashs_old.h"
-#include "Common.h"
+#include "common.h"
 
 void fors_skGen__OLD(uint8_t* pFORS, const uint8_t* SK_seed, const void* PK_seed,
-	uint8_t* adr, uint32_t ind);
+                     uint8_t* adr, uint32_t ind);
 
 void fors_node__OLD(uint8_t* pFORS, const uint8_t* SK_seed, uint32_t i, uint32_t z,
 	const void* PK_seed_,

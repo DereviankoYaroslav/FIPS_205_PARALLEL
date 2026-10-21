@@ -22,7 +22,7 @@ add_compile_options(-Wno-implicit-int)
 set(SOURCES
         AVX256.c
         AVX512.c
-        AVXconst.c
+        avx_constants.c
         Common.c
         fips202.c
         FIPS205_internal.c

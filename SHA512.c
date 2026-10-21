@@ -3,7 +3,7 @@
 #include "FIPS_205_Params.h"
 #include "SHA512_defined.h"
 #include "SHA512.h"
-#include "Common.h"
+#include "common.h"
 
 
 #define WL128(padded, bytes){            \
@@ -730,13 +730,13 @@ void MGF1_sha512(uint8_t* out, uint32_t outlen,
     uint32_t blocks = outlen / 64;
     uint8_t* pend = inbuf + inlen;
     for (i = 0; i < blocks; i++) {
-        toByte32_(pend, i);
+        to_byte32_(pend, i);
         sha512 (out, inbuf, inlen + 4);
         out += 64;
     }
     /* Until we cannot anymore, and we fill the remainder. */
     if (outlen > blocks * 64) {
-        toByte32_(pend, i);
+        to_byte32_(pend, i);
         sha512 (outbuf, inbuf, inlen + 4);
         memcpy(out, outbuf, outlen - i * 64);
     }
