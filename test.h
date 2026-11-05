@@ -6,7 +6,7 @@ int test_calc_w();
 int test_sha512();
 int test_sha512_with_predcalc();
 //int test_AVX_sha256_compress4();
-int test_AVX_sha256();
+int test_AVX_and_SHANI_sha256();
 int test_MGF1_AVX_sha256();
 int test_HMAC512();
 int test_AVX_HMAC();
@@ -41,7 +41,7 @@ int test_internal_function();
 
 
 int test_2_b();
-
+int test_seq_vs_parallel();
 
 #endif
 
