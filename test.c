@@ -4625,37 +4625,37 @@ void seed_state(const unsigned char* pub_seed);
 
 int test_seq_vs_parallel_sha256()
 {
-    int res = 0;
-    uint8_t PK_seed[FIPS205_N];
-    uint8_t Msg8[8][FIPS205_N];
-    uint32_t addrx8[8 * 8];                         // 8 addresses, 32 bytes each, first 22 bytes used (ADRSc)
-    uint8_t in8[8][ADR_SIZE + FIPS205_N];          // ADRSc || M for AVX_sha256_WITH_PREDCALC8
-    ALIGN64 uint8_t h_seq[8][FIPS205_N];
-    ALIGN64 uint8_t h_x8[8][FIPS205_N];
-    ALIGN64 uint8_t h_avx[8][FIPS205_N];           // aligned: PREDCALC8 uses aligned stores for n = 32
-    ALIGN64 uint32_t state[8];
+	int res = 0;
+	uint8_t PK_seed[FIPS205_N];
+	uint8_t Msg8[8][FIPS205_N];
+	uint32_t addrx8[8 * 8];                         // 8 addresses, 32 bytes each, first 22 bytes used (ADRSc)
+	uint8_t in8[8][ADR_SIZE + FIPS205_N];          // ADRSc || M for AVX_sha256_WITH_PREDCALC8
+	ALIGN64 uint8_t h_seq[8][FIPS205_N];
+	ALIGN64 uint8_t h_x8[8][FIPS205_N];
+	ALIGN64 uint8_t h_avx[8][FIPS205_N];           // aligned: PREDCALC8 uses aligned stores for n = 32
+	ALIGN64 uint32_t state[8];
 #ifndef _DEBUG
-    uint64_t t_seq, t_x8, t_avx;
+	uint64_t t_seq, t_x8, t_avx;
 #endif
 
-    srand(0);
-    for (int i = 0; i < FIPS205_N; ++i)
-        PK_seed[i] = rand() % 256;
-    for (int j = 0; j < 8; ++j)
-        for (int i = 0; i < FIPS205_N; ++i)
-            Msg8[j][i] = rand() % 256;
-    for (int i = 0; i < 8 * 8; ++i)
-        addrx8[i] = rand32();
+	srand(0);
+	for (int i = 0; i < FIPS205_N; ++i)
+		PK_seed[i] = rand() % 256;
+	for (int j = 0; j < 8; ++j)
+		for (int i = 0; i < FIPS205_N; ++i)
+			Msg8[j][i] = rand() % 256;
+	for (int i = 0; i < 8 * 8; ++i)
+		addrx8[i] = rand32();
 
-    for (int j = 0; j < 8; ++j)
-    {
-        memcpy(in8[j], addrx8 + 8 * j, ADR_SIZE);
-        memcpy(in8[j] + ADR_SIZE, Msg8[j], FIPS205_N);
-    }
+	for (int j = 0; j < 8; ++j)
+	{
+		memcpy(in8[j], addrx8 + 8 * j, ADR_SIZE);
+		memcpy(in8[j] + ADR_SIZE, Msg8[j], FIPS205_N);
+	}
 
-    // Precomputation of the PK.seed block (not timed, same for all variants)
-    seed_state(PK_seed);                        // basic: fills state_seeded
-    AVX_sha256_predcalc_pk(state, PK_seed);     // author's
+	// Precomputation of the PK.seed block (not timed, same for all variants)
+	seed_state(PK_seed);                        // basic: fills state_seeded
+	AVX_sha256_predcalc_pk(state, PK_seed);     // author's
 
 	// Warm-up: bring the CPU to full frequency and load caches for all variants
 	for (int i = 0; i < 1000; ++i)
@@ -4671,80 +4671,80 @@ int test_seq_vs_parallel_sha256()
 		AVX_sha256_WITH_PREDCALC8(h_avx, state, in8);
 	}
 
-    // 1) Basic implementation, sequential computation
+	// 1) Basic implementation, sequential computation
 #ifndef _DEBUG
-    min_tacts = 0xFFFFFFFFFFFFFFFF;
-    for (int i = 0; i < 256; ++i)
-    {
-        tacts = __rdtsc();
+	min_tacts = 0xFFFFFFFFFFFFFFFF;
+	for (int i = 0; i < 256; ++i)
+	{
+		tacts = __rdtsc();
 #endif
-        for (int j = 0; j < 8; ++j)
-            thash(h_seq[j], Msg8[j], 1, PK_seed, addrx8 + 8 * j);
+		for (int j = 0; j < 8; ++j)
+			thash(h_seq[j], Msg8[j], 1, PK_seed, addrx8 + 8 * j);
 #ifndef _DEBUG
-        tacts = __rdtsc() - tacts;
-        if (min_tacts > tacts)
-            min_tacts = tacts;
-    }
-    t_seq = min_tacts;
-    printf("Basic implementation, sequential (8 x thash) time = %" PRIu64 "\n", min_tacts);
-#endif
-
-    // 2) Basic implementation, parallel computation
-#ifndef _DEBUG
-    min_tacts = 0xFFFFFFFFFFFFFFFF;
-    for (int i = 0; i < 256; ++i)
-    {
-        tacts = __rdtsc();
-#endif
-        thashx8(
-            h_x8[0], h_x8[1], h_x8[2], h_x8[3],
-            h_x8[4], h_x8[5], h_x8[6], h_x8[7],
-            Msg8[0], Msg8[1], Msg8[2], Msg8[3],
-            Msg8[4], Msg8[5], Msg8[6], Msg8[7],
-            1, PK_seed, addrx8);
-#ifndef _DEBUG
-        tacts = __rdtsc() - tacts;
-        if (min_tacts > tacts)
-            min_tacts = tacts;
-    }
-    t_x8 = min_tacts;
-    printf("Basic implementation, parallel (thashx8) time = %" PRIu64 "\n", min_tacts);
+		tacts = __rdtsc() - tacts;
+		if (min_tacts > tacts)
+			min_tacts = tacts;
+	}
+	t_seq = min_tacts;
+	printf("Basic implementation, sequential (8 x thash) time = %" PRIu64 "\n", min_tacts);
 #endif
 
-    // 3) Author's implementation, parallel computation
+	// 2) Basic implementation, parallel computation
 #ifndef _DEBUG
-    min_tacts = 0xFFFFFFFFFFFFFFFF;
-    for (int i = 0; i < 256; ++i)
-    {
-        tacts = __rdtsc();
+	min_tacts = 0xFFFFFFFFFFFFFFFF;
+	for (int i = 0; i < 256; ++i)
+	{
+		tacts = __rdtsc();
 #endif
-        AVX_sha256_WITH_PREDCALC8(h_avx, state, in8);
+		thashx8(
+			h_x8[0], h_x8[1], h_x8[2], h_x8[3],
+			h_x8[4], h_x8[5], h_x8[6], h_x8[7],
+			Msg8[0], Msg8[1], Msg8[2], Msg8[3],
+			Msg8[4], Msg8[5], Msg8[6], Msg8[7],
+			1, PK_seed, addrx8);
 #ifndef _DEBUG
-        tacts = __rdtsc() - tacts;
-        if (min_tacts > tacts)
-            min_tacts = tacts;
-    }
-    t_avx = min_tacts;
-    printf("AVX_sha256_WITH_PREDCALC8 time = %" PRIu64 "\n", min_tacts);
-
-    printf("Speedup thashx8 vs sequential = %.3f\n", (double)t_seq / t_x8);
-    printf("Speedup AVX_sha256_WITH_PREDCALC8 vs sequential = %.3f\n", (double)t_seq / t_avx);
-    printf("Speedup AVX_sha256_WITH_PREDCALC8 vs thashx8 = %.3f\n", (double)t_x8 / t_avx);
+		tacts = __rdtsc() - tacts;
+		if (min_tacts > tacts)
+			min_tacts = tacts;
+	}
+	t_x8 = min_tacts;
+	printf("Basic implementation, parallel (thashx8) time = %" PRIu64 "\n", min_tacts);
 #endif
 
-    // All three variants must produce identical hashes
-    if (memcmp(h_seq, h_x8, sizeof(h_seq)) != 0)
-    {
-        printf("test_table2_F_x8: thash and thashx8 results differ\n");
-        res = 1;
-    }
-    if (memcmp(h_seq, h_avx, sizeof(h_seq)) != 0)
-    {
-        printf("test_table2_F_x8: thash and AVX_sha256_WITH_PREDCALC8 results differ\n");
-        res = 1;
-    }
+	// 3) Author's implementation, parallel computation
+#ifndef _DEBUG
+	min_tacts = 0xFFFFFFFFFFFFFFFF;
+	for (int i = 0; i < 256; ++i)
+	{
+		tacts = __rdtsc();
+#endif
+		AVX_sha256_WITH_PREDCALC8(h_avx, state, in8);
+#ifndef _DEBUG
+		tacts = __rdtsc() - tacts;
+		if (min_tacts > tacts)
+			min_tacts = tacts;
+	}
+	t_avx = min_tacts;
+	printf("AVX_sha256_WITH_PREDCALC8 time = %" PRIu64 "\n", min_tacts);
 
-    return res;
+	printf("Speedup thashx8 vs sequential = %.3f\n", (double)t_seq / t_x8);
+	printf("Speedup AVX_sha256_WITH_PREDCALC8 vs sequential = %.3f\n", (double)t_seq / t_avx);
+	printf("Speedup AVX_sha256_WITH_PREDCALC8 vs thashx8 = %.3f\n", (double)t_x8 / t_avx);
+#endif
+
+	// All three variants must produce identical hashes
+	if (memcmp(h_seq, h_x8, sizeof(h_seq)) != 0)
+	{
+		printf("test_table2_F_x8: thash and thashx8 results differ\n");
+		res = 1;
+	}
+	if (memcmp(h_seq, h_avx, sizeof(h_seq)) != 0)
+	{
+		printf("test_table2_F_x8: thash and AVX_sha256_WITH_PREDCALC8 results differ\n");
+		res = 1;
+	}
+
+	return res;
 }
 
 int test_internal_function()
