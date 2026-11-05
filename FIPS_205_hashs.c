@@ -4,11 +4,11 @@
 
 
 #include "FIPS_205_Hashs.h"
-#include "AVX256.h"
+#include "avx256.h"
 #include "OLD/sha256.h"
 #include "OLD/hash.h"
 #if FIPS205_N > 16
-#include "SHA512.h"
+#include "sha512.h"
 #include "AVX512.h"
 #endif
 

@@ -6,13 +6,9 @@ void sha512(uint8_t* out, const uint8_t* in, size_t inlen);
 void HMAC512(uint8_t* dest, const uint8_t* sk, const uint8_t* src, uint32_t len);
 void MGF1_sha512(uint8_t* out, uint32_t outlen, const uint8_t* in, uint32_t inlen);
 
-
-void sha512_predcalc_pk(uint64_t* state64, const uint8_t* in_);
-
 // Для даних завдовжки один блок
 void sha512_with_predcalc2_(uint8_t* out, uint64_t* state, const uint8_t* in, uint32_t inlen);
 // Для даних довільної довжини
-size_t sha512_with_predcalc_(uint8_t* out, uint64_t* predcalc_pk, uint8_t* in, size_t inlen);
-
+void sha512_with_predcalc_(uint8_t* out, uint64_t* predcalc_pk, uint8_t* in, size_t inlen);
 
 #endif

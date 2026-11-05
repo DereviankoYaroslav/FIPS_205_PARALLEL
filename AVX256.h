@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <string.h>
-#include "SHA256_device.h"
+#include "sha256_device.h"
 #include "FIPS_205_Adr.h"
 
 void AVX_sha256_compress(

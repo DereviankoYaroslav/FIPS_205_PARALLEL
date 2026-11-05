@@ -15,7 +15,7 @@
 #include "FIPS_205_Hashs.h"
 
 #include "avx_constants.h"
-#include "AVX256.h"
+#include "avx256.h"
 #include "OLD/sha256.h"
 
 void replace_blocks_key8__(__m256i blockdest_[16], __m256i blockkey256[8]);

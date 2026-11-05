@@ -13,7 +13,8 @@
 void thash(unsigned char *out, const unsigned char *in, unsigned int inblocks,
            const unsigned char *pub_seed, uint32_t addr[8])
 {
-    unsigned char *buf = malloc (SPX_SHA256_ADDR_BYTES + inblocks*SPX_N);
+	unsigned char *buf = _alloca (SPX_SHA256_ADDR_BYTES + inblocks*SPX_N);
+    //unsigned char *buf = malloc (SPX_SHA256_ADDR_BYTES + inblocks*SPX_N);
     unsigned char outbuf[SPX_SHA256_OUTPUT_BYTES];
     uint8_t sha2_state[40];
 
@@ -27,5 +28,5 @@ void thash(unsigned char *out, const unsigned char *in, unsigned int inblocks,
 
     sha256_inc_finalize(outbuf, sha2_state, buf, SPX_SHA256_ADDR_BYTES + inblocks*SPX_N);
     memcpy(out, outbuf, SPX_N);
-    free (buf);
+    //free (buf);
 }

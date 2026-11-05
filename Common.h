@@ -97,14 +97,14 @@ static void to_byte32_(
 	byte[3] = (uint8_t)(value & 0xFF); value >>= 8;
 	byte[2] = (uint8_t)(value & 0xFF); value >>= 8;
 	byte[1] = (uint8_t)(value & 0xFF); value >>= 8;
-	byte[0] = (uint8_t)(value & 0xFF); 
+	byte[0] = (uint8_t)(value & 0xFF);
 }
 
 static void to_byte16(
 	uint8_t* byte,
 	uint16_t value)
 {
-	
+
 	byte[1] = (uint8_t)(value & 0xFF); value >>= 8;
 	byte[0] = (uint8_t)(value & 0xFF);
 }

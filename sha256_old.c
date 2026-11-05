@@ -8,7 +8,7 @@
 
 #include "FIPS_205_Common_fun_old.h"
 #include "sha2.h"
-#include "SHA512.h"
+#include "sha512.h"
 //#include ""
 
 void u32_to_bytes_(unsigned char* out, uint32_t in)

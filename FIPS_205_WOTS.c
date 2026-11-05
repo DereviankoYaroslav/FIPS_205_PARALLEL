@@ -3,7 +3,7 @@
 #include "FIPS_205_Adr.h"
 #include "Common.h"
 #if FIPS205_N != 16
-#include "SHA512.h"
+#include "sha512.h"
 #include "AVX512.h"
 #endif
 

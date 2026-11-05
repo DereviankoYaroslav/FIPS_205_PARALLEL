@@ -568,58 +568,6 @@ int read_json_tests(
 	return count;
 }
 
-
-SUCCESS read_json_sig_gen(
-	uint8_t* sk,
-	uint8_t* sig,
-	uint8_t* msg,
-	int* msg_len,
-	uint8_t *prnd,
-	int *is_prnd,
-	PTEST test,
-	const size_t max_msg)
-{
-	SUCCESS success = ERROR;
-	uint8_t* cur = test->start, * cur_end = test->finish;
-	uint8_t* p;
-	int count;
-	*is_prnd = 0;
-	*msg_len = 0;
-
-	cur = read_json16_char_count(&count, cur, cur_end, "\"sk\"");
-
-	if (cur && count / 2 == FIPS205_SK_BYTES)
-	{
-		cur = read_json_hex(sk, cur + 1, count / 2);
-		p = read_json16_char_count(&count, test->start, cur_end, "\"additionalRandomness\"");
-
-		if (p != 0 && count / 2 == FIPS205_N)
-		{
-			if (read_json_hex(prnd, p + 1, count / 2) != 0)
-				*is_prnd = 1;
-		}
-
-		cur = read_json16_char_count(&count, cur, cur_end, "\"message\"");
-
-		if (cur && count >= 0 && (size_t)(count / 2) * 8 <= max_msg)
-		{
-			*msg_len = (count / 2) * 8;
-			cur = read_json_hex(msg, cur + 1, count / 2);
-			cur = read_json16_char_count(&count, cur, cur_end, "\"signature\"");
-
-			if (cur && count / 2 == FIPS205_SIG_BYTES)
-			{
-				cur = read_json_hex(sig, cur + 1, count / 2);
-
-				if (cur)
-					success = OK;
-			}
-		}
-	}
-
-	return success;
-}
-
 SUCCESS read_json_group_title(
 	PJSON_TEST_GROUP group,
 	const int mode)
@@ -706,68 +654,6 @@ static void reset_predcalc()
 #endif
 }
 
-SUCCESS json_sig_gen(
-	PJSON_TEST_GROUP groups,
-	const int groups_count)
-{
-	SUCCESS success = ERROR, overall = ERROR;
-	int i, j, executed = 0;
-	static uint8_t sk[FIPS205_SK_BYTES], sig[FIPS205_SIG_BYTES], read_sig [FIPS205_SIG_BYTES], rnd [FIPS205_N];
-	uint8_t* m;
-	int m_len, is_rnd;
-
-	for (i = 0; i < groups_count; ++i)
-	{
-		if (read_json_group_title(&groups[i], SIGGEN_TYPE) != OK)
-			continue;
-
-		if (groups[i].parameter_set != FIPS_205_MODE)
-			continue;
-		if (strcmp(groups[i].pre_hash, "none") != 0)
-			continue;
-
-		m = malloc(groups[i].jtml.max / 8);
-
-		if (m)
-		{
-			int tests = read_json_tests(groups[i].tests, groups[i].start, groups[i].finish);
-
-			for (j = 0; j < tests; ++j)
-			{
-				success = read_json_sig_gen(sk, read_sig, m, &m_len, rnd, &is_rnd,
-							 &groups[i].tests[j], (size_t)groups[i].jtml.max);
-
-				if (success == OK)
-				{
-					reset_predcalc();
-					memset(sig, 0, FIPS205_SIG_BYTES);
-
-					if (is_rnd)
-						FIPS205_sign_internal_new__(sig, m, m_len / 8, sk, rnd);
-					else
-						FIPS205_sign_internal_new__(sig, m, m_len / 8, sk, sk + 2 * FIPS205_N);
-
-					if (memcmp(read_sig, sig, FIPS205_SIG_BYTES) != 0)
-						success = ERROR;
-
-					++executed;
-					if (success != OK)
-						overall = ERROR;
-					else if (executed == 1)
-						overall = OK;
-				}
-				else
-					overall = ERROR;
-
-				printf("%s\tSIGGEN\ttest %d %s\n", smodes[FIPS_205_MODE],
-				       groups[i].tests[j].tc_id, success == OK ? "OK" : "ERROR");
-			}
-			free(m);
-		}
-	}
-	return executed ? overall : ERROR;
-}
-
 SUCCESS read_json_key_gen(
 	uint8_t* sk,
 	uint8_t* pk,
@@ -851,12 +737,12 @@ SUCCESS json_key_gen(
 				FIPS205_keygen_internal(PKroot, SKseed, SKprf, PKseed);
 
 				/* sk = SK.seed||SK.prf||PK.seed||PK.root, pk = PK.seed||PK.root */
-				if (memcmp(sk_read,                     SKseed, FIPS205_N) ||
-				    memcmp(sk_read +     FIPS205_N,     SKprf,  FIPS205_N) ||
-				    memcmp(sk_read + 2 * FIPS205_N,     PKseed, FIPS205_N) ||
-				    memcmp(sk_read + 3 * FIPS205_N,     PKroot, FIPS205_N) ||
-				    memcmp(pk_read,                     PKseed, FIPS205_N) ||
-				    memcmp(pk_read +     FIPS205_N,     PKroot, FIPS205_N))
+				if (memcmp(sk_read, SKseed, FIPS205_N) ||
+				    memcmp(sk_read + FIPS205_N, SKprf, FIPS205_N) ||
+				    memcmp(sk_read + 2 * FIPS205_N, PKseed, FIPS205_N) ||
+				    memcmp(sk_read + 3 * FIPS205_N, PKroot, FIPS205_N) ||
+				    memcmp(pk_read, PKseed, FIPS205_N) ||
+				    memcmp(pk_read + FIPS205_N, PKroot, FIPS205_N))
 					success = ERROR;
 
 				++executed;
@@ -873,6 +759,119 @@ SUCCESS json_key_gen(
 		}
 	}
 
+	return executed ? overall : ERROR;
+}
+
+SUCCESS read_json_sig_gen(
+	uint8_t* sk,
+	uint8_t* sig,
+	uint8_t* msg,
+	int* msg_len,
+	uint8_t *prnd,
+	int *is_prnd,
+	PTEST test,
+	const size_t max_msg)
+{
+	SUCCESS success = ERROR;
+	uint8_t* cur = test->start, * cur_end = test->finish;
+	uint8_t* p;
+	int count;
+	*is_prnd = 0;
+	*msg_len = 0;
+
+	cur = read_json16_char_count(&count, cur, cur_end, "\"sk\"");
+
+	if (cur && count / 2 == FIPS205_SK_BYTES)
+	{
+		cur = read_json_hex(sk, cur + 1, count / 2);
+		p = read_json16_char_count(&count, test->start, cur_end, "\"additionalRandomness\"");
+
+		if (p != 0 && count / 2 == FIPS205_N)
+		{
+			if (read_json_hex(prnd, p + 1, count / 2) != 0)
+				*is_prnd = 1;
+		}
+
+		cur = read_json16_char_count(&count, cur, cur_end, "\"message\"");
+
+		if (cur && count >= 0 && (size_t)(count / 2) * 8 <= max_msg)
+		{
+			*msg_len = (count / 2) * 8;
+			cur = read_json_hex(msg, cur + 1, count / 2);
+			cur = read_json16_char_count(&count, cur, cur_end, "\"signature\"");
+
+			if (cur && count / 2 == FIPS205_SIG_BYTES)
+			{
+				cur = read_json_hex(sig, cur + 1, count / 2);
+
+				if (cur)
+					success = OK;
+			}
+		}
+	}
+
+	return success;
+}
+
+SUCCESS json_sig_gen(
+	PJSON_TEST_GROUP groups,
+	const int groups_count)
+{
+	SUCCESS success = ERROR, overall = ERROR;
+	int i, j, executed = 0;
+	static uint8_t sk[FIPS205_SK_BYTES], sig[FIPS205_SIG_BYTES], read_sig [FIPS205_SIG_BYTES], rnd [FIPS205_N];
+	uint8_t* m;
+	int m_len, is_rnd;
+
+	for (i = 0; i < groups_count; ++i)
+	{
+		if (read_json_group_title(&groups[i], SIGGEN_TYPE) != OK)
+			continue;
+
+		if (groups[i].parameter_set != FIPS_205_MODE)
+			continue;
+		if (strcmp(groups[i].pre_hash, "none") != 0)
+			continue;
+
+		m = malloc(groups[i].jtml.max / 8);
+
+		if (m)
+		{
+			int tests = read_json_tests(groups[i].tests, groups[i].start, groups[i].finish);
+
+			for (j = 0; j < tests; ++j)
+			{
+				success = read_json_sig_gen(sk, read_sig, m, &m_len, rnd, &is_rnd,
+							 &groups[i].tests[j], (size_t)groups[i].jtml.max);
+
+				if (success == OK)
+				{
+					reset_predcalc();
+					memset(sig, 0, FIPS205_SIG_BYTES);
+
+					if (is_rnd)
+						FIPS205_sign_internal_new__(sig, m, m_len / 8, sk, rnd);
+					else
+						FIPS205_sign_internal_new__(sig, m, m_len / 8, sk, sk + 2 * FIPS205_N);
+
+					if (memcmp(read_sig, sig, FIPS205_SIG_BYTES) != 0)
+						success = ERROR;
+
+					++executed;
+					if (success != OK)
+						overall = ERROR;
+					else if (executed == 1)
+						overall = OK;
+				}
+				else
+					overall = ERROR;
+
+				printf("%s\tSIGGEN\ttest %d %s\n", smodes[FIPS_205_MODE],
+					   groups[i].tests[j].tc_id, success == OK ? "OK" : "ERROR");
+			}
+			free(m);
+		}
+	}
 	return executed ? overall : ERROR;
 }
 
@@ -992,7 +991,7 @@ SUCCESS json_sig_ver(
 	return executed ? overall : ERROR;
 }
 
-SUCCESS test_json_file(
+SUCCESS test_by_json_file(
 	const char* fn)
 {
 	SUCCESS success = ERROR;
@@ -1061,18 +1060,17 @@ SUCCESS test_json_file(
 	return success;
 }
 
-SUCCESS test_json()
+SUCCESS json_test()
 {
 	SUCCESS success = OK;
 
-	/* all three files are run even if an earlier one fails */
-	if (test_json_file(KEYGEN_FILE) != OK)
+	if (test_by_json_file(KEYGEN_FILE) != OK)
 		success = ERROR;
 
-	if (test_json_file(SIGGEN_FILE) != OK)
+	if (test_by_json_file(SIGGEN_FILE) != OK)
 		success = ERROR;
 
-	if (test_json_file(SIGVER_FILE) != OK)
+	if (test_by_json_file(SIGVER_FILE) != OK)
 		success = ERROR;
 
 	return success;

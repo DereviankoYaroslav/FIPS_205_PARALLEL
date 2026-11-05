@@ -155,7 +155,7 @@
     <ClInclude Include="FIPS_205_Hashs.h" />
     <ClInclude Include="FIPS_205_Hashs_old.h" />
     <ClInclude Include="FIPS_205_internal_old.h" />
-    <ClInclude Include="FIPS_205_JSon.h" />
+    <ClInclude Include="FIPS_205_json_tests.h" />
     <ClInclude Include="FIPS_205_Params.h" />
     <ClInclude Include="FIPS_205_Test.h" />
     <ClInclude Include="FIPS_205_wots_old.h" />
@@ -193,7 +193,7 @@
     <ClCompile Include="FIPS_205_ht.c" />
     <ClCompile Include="FIPS_205_ht_old.c" />
     <ClCompile Include="FIPS_205_internal_old.c" />
-    <ClCompile Include="FIPS_205_json.c" />
+    <ClCompile Include="FIPS_205_json_tests.c" />
     <ClCompile Include="FIPS_205_xmss_old.c" />
     <ClCompile Include="FIPS_205_Addr.c" />
     <ClCompile Include="FIPS_205_Common_fun_old.c" />

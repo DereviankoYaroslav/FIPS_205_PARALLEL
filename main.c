@@ -1,10 +1,10 @@
 #include <stdio.h>
 
-#include "SHA256_device.h"
+#include "sha256_device.h"
 #include "common.h"
 #include "FIPS_205_Params.h"
 #include "FIPS_205_Adr.h"
-#include "FIPS_205_Test.h"
+#include "test.h"
 #include "avx_constants.h"
 #include "FIPS_205_json_tests.h"
 
@@ -28,10 +28,25 @@ int main()
 	set_avx_constants();
 
 #ifdef _JSON_FILE
-	res = test_json();
-	printf("%s:\tTestJSon - %s\n", smodes[FIPS_205_MODE], res == OK ? "OK" : "ERROR");
+	res = json_test();
+	printf("%s:\tJSON KAT: %s\n", smodes[FIPS_205_MODE], res == OK ? "OK" : "ERROR");
 	printf("---------------------------------------------------------------------------------\n\n");
 #endif
+
+	res = test_addr();
+	printf("Test address get and set functions: %s\n", res == OK ? "OK" : "ERROR");
+	printf("---------------------------------------------------------------------------------\n\n");
+
+	res = test_AVX_and_SHANI_sha256();
+	printf("Test AVX and SHANI sha256 implementation: %s\n", res == OK ? "OK" : "ERROR");
+	printf("---------------------------------------------------------------------------------\n\n");
+
+	res = test_seq_vs_parallel_sha256();
+	printf("Test sequential vs parallel SHA-256 hash calculations %s\n", res == OK ? "OK" : "ERROR");
+
+	res = test_MGF1_AVX_sha256 ();
+	printf("test_MGF1_AVX_sha256 %s\n", res == OK ? "OK" : "ERROR");
+	printf("---------------------------------------------------------------------------------\n\n");
 
 #if FIPS205_N > 16
 	res = test_AVX_sha512();
@@ -40,18 +55,6 @@ int main()
 	res = test_AVX_sha512_compress4();
 	printf("test_AVX_sha512_compress4 %s\n", res == OK ? "OK" : "ERROR");
 #endif
-
-	res = test_addr();
-	printf("test_addr %s\n", res == OK ? "OK" : "ERROR");
-	printf("---------------------------------------------------------------------------------\n\n");
-
-	res = test_AVX_sha256();
-	printf("test_AVX_sha256 %s\n", res == OK ? "OK" : "ERROR");
-	printf("---------------------------------------------------------------------------------\n\n");
-
-	res = test_MGF1_AVX_sha256 ();
-	printf("test_MGF1_AVX_sha256 %s\n", res == OK ? "OK" : "ERROR");
-	printf("---------------------------------------------------------------------------------\n\n");
 
 #if FIPS205_N == 16
 	res = test_AVX_HMAC();

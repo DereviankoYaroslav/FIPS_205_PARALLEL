@@ -3,7 +3,7 @@
 #include "avx_constants.h"
 #include "AVX512.h"
 #include "SHA512_defined.h"
-#include "SHA512.h"
+#include "sha512.h"
 #include "common.h"
 
 #if _WIN32

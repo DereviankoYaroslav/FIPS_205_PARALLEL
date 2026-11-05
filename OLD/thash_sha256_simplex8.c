@@ -31,7 +31,8 @@ void thashx8(unsigned char *out0,
              const unsigned char *in7, unsigned int inblocks,
              const unsigned char *pub_seed, uint32_t addrx8[8*8])
 {
-    unsigned char *bufx8 = malloc (8*(SPX_SHA256_ADDR_BYTES + inblocks*FIPS205_N));
+	unsigned char *bufx8 = _alloca (8*(SPX_SHA256_ADDR_BYTES + inblocks*FIPS205_N));
+	//unsigned char *bufx8 = malloc (8*(SPX_SHA256_ADDR_BYTES + inblocks*FIPS205_N));
     unsigned char outbufx8[8*SPX_SHA256_OUTPUT_BYTES];
     unsigned int i;
     sha256ctx ctx;
@@ -91,5 +92,5 @@ void thashx8(unsigned char *out0,
     memcpy(out5, outbufx8 + 5*SPX_SHA256_OUTPUT_BYTES, FIPS205_N);
     memcpy(out6, outbufx8 + 6*SPX_SHA256_OUTPUT_BYTES, FIPS205_N);
     memcpy(out7, outbufx8 + 7*SPX_SHA256_OUTPUT_BYTES, FIPS205_N);
-    free(bufx8);
+    //free(bufx8);
 }

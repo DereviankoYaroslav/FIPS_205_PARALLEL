@@ -41,7 +41,7 @@ int test_internal_function();
 
 
 int test_2_b();
-int test_seq_vs_parallel();
+int test_seq_vs_parallel_sha256();
 
 #endif
 

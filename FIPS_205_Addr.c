@@ -4,6 +4,7 @@
 
 #include "FIPS_205_Params.h"
 #include "FIPS_205_Adr.h"
+
 SUCCESS test_addr()
 {
 #ifdef SHA
@@ -52,5 +53,4 @@ SUCCESS test_addr()
 	res |= value2 != 10;
 
 	return res;
-
 }

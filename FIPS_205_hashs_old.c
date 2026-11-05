@@ -15,7 +15,7 @@ static uint64_t tacts, min_tacts;
 #include "FIPS_205_Hashs_old.h"
 #include "FIPS_205_Adr_old.h"
 #include "sha2.h"
-#include "SHA512.h"
+#include "sha512.h"
 
 #ifdef _DEBUG
 int PRFmsgCnt = 0, PRFCnt = 0, TlCnt = 0, HASHCnt = 0, FCnt = 0, HMsgCnt = 0;

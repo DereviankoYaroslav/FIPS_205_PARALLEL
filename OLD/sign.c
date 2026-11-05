@@ -115,7 +115,15 @@ int crypto_sign_seed_keypair(unsigned char *pk, unsigned char *sk,
 //
 //  return 0;
 //}
-void ht_signature(uint8_t* sig, unsigned char *root, uint8_t * sk_seed, uint8_t *pub_seed, uint8_t* wots_addr, uint8_t* tree_addr, uint64_t tree, uint32_t idx_leaf)
+void ht_signature(
+	uint8_t* sig,
+	unsigned char *root,
+	uint8_t * sk_seed,
+	uint8_t *pub_seed,
+	uint8_t* wots_addr,
+	uint8_t* tree_addr,
+	uint64_t tree,
+	uint32_t idx_leaf)
 {
     int i;
     set_type(wots_addr, SPX_ADDR_TYPE_WOTS);
