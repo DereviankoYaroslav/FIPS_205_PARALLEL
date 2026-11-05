@@ -4630,6 +4630,7 @@ int test_seq_vs_parallel_sha256()
 	uint8_t Msg8[8][FIPS205_N];
 	uint32_t addrx8[8 * 8];                         // 8 addresses, 32 bytes each, first 22 bytes used (ADRSc)
 	uint8_t in8[8][ADR_SIZE + FIPS205_N];          // ADRSc || M for AVX_sha256_WITH_PREDCALC8
+
 	ALIGN64 uint8_t h_seq[8][FIPS205_N];
 	ALIGN64 uint8_t h_x8[8][FIPS205_N];
 	ALIGN64 uint8_t h_avx[8][FIPS205_N];           // aligned: PREDCALC8 uses aligned stores for n = 32
@@ -4640,12 +4641,22 @@ int test_seq_vs_parallel_sha256()
 
 	srand(0);
 	for (int i = 0; i < FIPS205_N; ++i)
+	{
 		PK_seed[i] = rand() % 256;
+	}
+
 	for (int j = 0; j < 8; ++j)
+	{
 		for (int i = 0; i < FIPS205_N; ++i)
+		{
 			Msg8[j][i] = rand() % 256;
+		}
+	}
+
 	for (int i = 0; i < 8 * 8; ++i)
+	{
 		addrx8[i] = rand32();
+	}
 
 	for (int j = 0; j < 8; ++j)
 	{
